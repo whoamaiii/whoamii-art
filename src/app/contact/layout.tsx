@@ -1,0 +1,10 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Contact | Inner Eye Signal",
+  description: "Contact Quentin Qmann for commissions, collaborations, and licensing inquiries."
+};
+
+export default function ContactLayout({ children }: { children: React.ReactNode }) {
+  return children;
+}

@@ -1,0 +1,85 @@
+{
+    "instaloader": {
+        "node_type": "Profile",
+        "version": "4.15"
+    },
+    "node": {
+        "ai_agent_owner_username": null,
+        "ai_agent_type": null,
+        "bio_links": [],
+        "biography": "Surrer bare rundt her i verden",
+        "biography_with_entities": {
+            "entities": [],
+            "raw_text": "Surrer bare rundt her i verden"
+        },
+        "blocked_by_viewer": false,
+        "business_address_json": null,
+        "business_category_name": null,
+        "business_contact_method": "UNKNOWN",
+        "business_email": null,
+        "business_phone_number": null,
+        "category_enum": null,
+        "category_name": "Artist",
+        "country_block": false,
+        "edge_follow": {
+            "count": 302
+        },
+        "edge_followed_by": {
+            "count": 434
+        },
+        "edge_mutual_followed_by": {
+            "count": 0,
+            "edges": []
+        },
+        "edge_related_profiles": {
+            "edges": []
+        },
+        "eimu_id": "110812083646018",
+        "external_url": null,
+        "external_url_linkshimmed": null,
+        "fb_profile_biolink": null,
+        "fbid": "17841400958680580",
+        "followed_by_viewer": false,
+        "follows_viewer": false,
+        "full_name": "Quentin Thiessen",
+        "group_metadata": null,
+        "guardian_id": null,
+        "has_ar_effects": false,
+        "has_blocked_viewer": false,
+        "has_channel": false,
+        "has_clips": true,
+        "has_guides": false,
+        "has_onboarded_to_text_post_app": true,
+        "has_requested_viewer": false,
+        "hide_like_and_view_counts": false,
+        "highlight_reel_count": 5,
+        "id": "37151956",
+        "is_business_account": false,
+        "is_embeds_disabled": false,
+        "is_guardian_of_viewer": false,
+        "is_joined_recently": false,
+        "is_private": false,
+        "is_professional_account": true,
+        "is_regulated_c18": false,
+        "is_supervised_by_viewer": false,
+        "is_supervised_user": false,
+        "is_supervision_enabled": false,
+        "is_verified": true,
+        "is_verified_by_mv4b": false,
+        "overall_category_name": null,
+        "pinned_channels_list_count": 0,
+        "profile_pic_url": "https://instagram.fsvg1-1.fna.fbcdn.net/v/t51.2885-19/469094701_1570806467135329_6288358421584723503_n.jpg?stp=dst-jpg_e0_s150x150_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLmRqYW5nby4xMDgwLmMyIn0&_nc_ht=instagram.fsvg1-1.fna.fbcdn.net&_nc_cat=101&_nc_oc=Q6cZ2QFd5dw6eiaqIXpV5SN_Q_y8fNRQplV2t9EXuSIrkFn5Zge0wJ8A6MjVV9GzW-ZE3o0&_nc_ohc=28osZ0JjgXYQ7kNvwHbHu0z&_nc_gid=oSwWm604jyTeGXJ7lKxybA&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfsJh4GHAZsPFPCAzApGhZUlOO56PQujSH9eoGdveT96Ig&oe=69904284&_nc_sid=8b3546",
+        "profile_pic_url_hd": "https://instagram.fsvg1-1.fna.fbcdn.net/v/t51.2885-19/469094701_1570806467135329_6288358421584723503_n.jpg?stp=dst-jpg_s320x320_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLmRqYW5nby4xMDgwLmMyIn0&_nc_ht=instagram.fsvg1-1.fna.fbcdn.net&_nc_cat=101&_nc_oc=Q6cZ2QFd5dw6eiaqIXpV5SN_Q_y8fNRQplV2t9EXuSIrkFn5Zge0wJ8A6MjVV9GzW-ZE3o0&_nc_ohc=28osZ0JjgXYQ7kNvwHbHu0z&_nc_gid=oSwWm604jyTeGXJ7lKxybA&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfvSSP-o6WfDNCgjzq28ctmd7JZD2q8IUhd1VIuN3epT-g&oe=69904284&_nc_sid=8b3546",
+        "pronouns": [],
+        "remove_message_entrypoint": false,
+        "requested_by_viewer": false,
+        "restricted_by_viewer": null,
+        "should_show_category": true,
+        "should_show_public_contacts": false,
+        "show_account_transparency_details": true,
+        "show_text_post_app_badge": false,
+        "transparency_label": null,
+        "transparency_product": null,
+        "username": "quentin_qmann"
+    }
+}
