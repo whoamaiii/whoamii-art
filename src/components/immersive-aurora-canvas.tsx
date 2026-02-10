@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import * as THREE from "three";
+import { Color, Mesh, OrthographicCamera, PlaneGeometry, Scene, ShaderMaterial, Vector2, WebGLRenderer } from "three";
 
 interface ImmersiveAuroraCanvasProps {
   onError?: () => void;
@@ -106,14 +106,14 @@ export function ImmersiveAuroraCanvas({ onError }: ImmersiveAuroraCanvasProps) {
     }
 
     let frame = 0;
-    let renderer: THREE.WebGLRenderer | null = null;
-    let scene: THREE.Scene | null = null;
-    let camera: THREE.OrthographicCamera | null = null;
-    let geometry: THREE.PlaneGeometry | null = null;
-    let material: THREE.ShaderMaterial | null = null;
+    let renderer: WebGLRenderer | null = null;
+    let scene: Scene | null = null;
+    let camera: OrthographicCamera | null = null;
+    let geometry: PlaneGeometry | null = null;
+    let material: ShaderMaterial | null = null;
 
     try {
-      renderer = new THREE.WebGLRenderer({
+      renderer = new WebGLRenderer({
         canvas,
         alpha: true,
         antialias: false,
@@ -123,22 +123,22 @@ export function ImmersiveAuroraCanvas({ onError }: ImmersiveAuroraCanvasProps) {
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
       renderer.setSize(window.innerWidth, window.innerHeight, false);
 
-      scene = new THREE.Scene();
-      camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+      scene = new Scene();
+      camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
       const palette = readPalette();
 
       const uniforms = {
         uTime: { value: 0 },
-        uMouse: { value: new THREE.Vector2(0.5, 0.5) },
-        uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-        uColorA: { value: new THREE.Color(palette.a) },
-        uColorB: { value: new THREE.Color(palette.b) },
-        uColorC: { value: new THREE.Color(palette.c) }
+        uMouse: { value: new Vector2(0.5, 0.5) },
+        uResolution: { value: new Vector2(window.innerWidth, window.innerHeight) },
+        uColorA: { value: new Color(palette.a) },
+        uColorB: { value: new Color(palette.b) },
+        uColorC: { value: new Color(palette.c) }
       };
 
-      geometry = new THREE.PlaneGeometry(2, 2);
-      material = new THREE.ShaderMaterial({
+      geometry = new PlaneGeometry(2, 2);
+      material = new ShaderMaterial({
         uniforms,
         vertexShader,
         fragmentShader,
@@ -147,34 +147,50 @@ export function ImmersiveAuroraCanvas({ onError }: ImmersiveAuroraCanvasProps) {
         depthTest: false
       });
 
-      const quad = new THREE.Mesh(geometry, material);
+      const quad = new Mesh(geometry, material);
       scene.add(quad);
 
       const onPointerMove = (event: PointerEvent) => {
         uniforms.uMouse.value.set(event.clientX / window.innerWidth, event.clientY / window.innerHeight);
       };
 
+      let resizeRaf = 0;
       const onResize = () => {
-        renderer?.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
-        renderer?.setSize(window.innerWidth, window.innerHeight, false);
-        uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+        if (resizeRaf) return;
+        resizeRaf = window.requestAnimationFrame(() => {
+          resizeRaf = 0;
+          renderer?.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+          renderer?.setSize(window.innerWidth, window.innerHeight, false);
+          uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+        });
       };
 
+      let paused = false;
       const startedAt = performance.now();
+
       const tick = () => {
-        uniforms.uTime.value = (performance.now() - startedAt) / 1000;
-        renderer?.render(scene!, camera!);
+        if (!paused) {
+          uniforms.uTime.value = (performance.now() - startedAt) / 1000;
+          renderer?.render(scene!, camera!);
+        }
         frame = window.requestAnimationFrame(tick);
+      };
+
+      const onVisibilityChange = () => {
+        paused = document.hidden;
       };
 
       window.addEventListener("pointermove", onPointerMove, { passive: true });
       window.addEventListener("resize", onResize);
+      document.addEventListener("visibilitychange", onVisibilityChange);
       tick();
 
       return () => {
         window.cancelAnimationFrame(frame);
+        if (resizeRaf) window.cancelAnimationFrame(resizeRaf);
         window.removeEventListener("pointermove", onPointerMove);
         window.removeEventListener("resize", onResize);
+        document.removeEventListener("visibilitychange", onVisibilityChange);
         geometry?.dispose();
         material?.dispose();
         renderer?.dispose();

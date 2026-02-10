@@ -16,24 +16,25 @@ import {
   techniqueFilters
 } from "@/content/project-taxonomy";
 
+const techniqueOptions = new Set<string>(techniqueFilters);
+const subjectOptions = new Set<string>(subjectFilters);
+const intensityOptions = new Set<string>(intensityFilters);
+const colorOptions = new Set<string>(colorFilters);
+
+const isTechniqueOption = (value: string): value is (typeof techniqueFilters)[number] =>
+  techniqueOptions.has(value);
+const isSubjectOption = (value: string): value is (typeof subjectFilters)[number] =>
+  subjectOptions.has(value);
+const isIntensityOption = (value: string): value is (typeof intensityFilters)[number] =>
+  intensityOptions.has(value);
+const isColorOption = (value: string): value is (typeof colorFilters)[number] =>
+  colorOptions.has(value);
+
 export default function ReplicationsPage() {
   const [technique, setTechnique] = useState<(typeof techniqueFilters)[number]>("All");
   const [subject, setSubject] = useState<(typeof subjectFilters)[number]>("All");
   const [intensity, setIntensity] = useState<(typeof intensityFilters)[number]>("All");
   const [color, setColor] = useState<(typeof colorFilters)[number]>("All");
-  const techniqueOptions = new Set<string>(techniqueFilters);
-  const subjectOptions = new Set<string>(subjectFilters);
-  const intensityOptions = new Set<string>(intensityFilters);
-  const colorOptions = new Set<string>(colorFilters);
-
-  const isTechniqueOption = (value: string): value is (typeof techniqueFilters)[number] =>
-    techniqueOptions.has(value);
-  const isSubjectOption = (value: string): value is (typeof subjectFilters)[number] =>
-    subjectOptions.has(value);
-  const isIntensityOption = (value: string): value is (typeof intensityFilters)[number] =>
-    intensityOptions.has(value);
-  const isColorOption = (value: string): value is (typeof colorFilters)[number] =>
-    colorOptions.has(value);
 
   const filtered = useMemo(() => {
     return projects.filter((project) => {

@@ -1,0 +1,18 @@
+{"level":"info","message":"Using file-based communication bridge","timestamp":"2026-02-10T13:40:13.740Z"}
+{"level":"info","message":"Using Documents folder for file-based communication with prefix: temp_10185_mlgneo8b","timestamp":"2026-02-10T13:40:13.748Z"}
+{"level":"info","message":"Registered 92 tools","timestamp":"2026-02-10T13:40:13.754Z"}
+{"level":"info","message":"Adobe After Effects MCP server started in stdio mode","timestamp":"2026-02-10T13:40:13.755Z"}
+{"level":"info","message":"Using file-based bridge - no port conflicts!","timestamp":"2026-02-10T13:40:13.755Z"}
+{"capabilities":{"roots":{}},"clientInfo":{"name":"claude-code","version":"2.1.37"},"level":"info","message":"Initializing MCP server...","protocolVersion":"2025-11-25","timestamp":"2026-02-10T13:40:13.758Z"}
+{"level":"info","message":"Using Documents folder for file-based communication with prefix: claude-code_2_1_37_10185_mlgneo8v","timestamp":"2026-02-10T13:40:13.759Z"}
+{"level":"info","message":"Initialized with client prefix: claude-code_2_1_37_10185_mlgneo8v","timestamp":"2026-02-10T13:40:13.759Z"}
+{"level":"info","message":"Server initialized","timestamp":"2026-02-10T13:40:13.773Z"}
+{"level":"info","message":"Using file-based communication bridge","timestamp":"2026-02-10T13:40:13.767Z"}
+{"level":"info","message":"Using Documents folder for file-based communication with prefix: temp_10186_mlgneo93","timestamp":"2026-02-10T13:40:13.771Z"}
+{"level":"info","message":"Registered 92 tools","timestamp":"2026-02-10T13:40:13.772Z"}
+{"level":"info","message":"Adobe After Effects MCP server started in stdio mode","timestamp":"2026-02-10T13:40:13.772Z"}
+{"level":"info","message":"Using file-based bridge - no port conflicts!","timestamp":"2026-02-10T13:40:13.772Z"}
+{"capabilities":{"roots":{}},"clientInfo":{"name":"claude-code","version":"2.1.37"},"level":"info","message":"Initializing MCP server...","protocolVersion":"2025-11-25","timestamp":"2026-02-10T13:40:13.776Z"}
+{"level":"info","message":"Using Documents folder for file-based communication with prefix: claude-code_2_1_37_10186_mlgneo9d","timestamp":"2026-02-10T13:40:13.777Z"}
+{"level":"info","message":"Initialized with client prefix: claude-code_2_1_37_10186_mlgneo9d","timestamp":"2026-02-10T13:40:13.777Z"}
+{"level":"info","message":"Server initialized","timestamp":"2026-02-10T13:40:13.814Z"}

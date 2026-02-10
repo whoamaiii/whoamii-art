@@ -17,6 +17,10 @@ interface Ripple {
   y: number;
 }
 
+const BODY_SPRING = { stiffness: 380, damping: 28, mass: 0.24 };
+const TEXT_SPRING = { stiffness: 420, damping: 30, mass: 0.19 };
+const RIPPLE_TRANSITION = { duration: 0.4, ease: [0.23, 1, 0.32, 1] } as const;
+
 function mergeClassName(...values: Array<string | undefined>) {
   return values.filter(Boolean).join(" ");
 }
@@ -30,10 +34,10 @@ export function MagneticButton({ children, variant = "ghost", disabled = false }
   const y = useMotionValue(0);
   const textX = useMotionValue(0);
   const textY = useMotionValue(0);
-  const springX = useSpring(x, { stiffness: 380, damping: 28, mass: 0.24 });
-  const springY = useSpring(y, { stiffness: 380, damping: 28, mass: 0.24 });
-  const springTextX = useSpring(textX, { stiffness: 420, damping: 30, mass: 0.19 });
-  const springTextY = useSpring(textY, { stiffness: 420, damping: 30, mass: 0.19 });
+  const springX = useSpring(x, BODY_SPRING);
+  const springY = useSpring(y, BODY_SPRING);
+  const springTextX = useSpring(textX, TEXT_SPRING);
+  const springTextY = useSpring(textY, TEXT_SPRING);
 
   const [glowPoint, setGlowPoint] = useState({ x: "50%", y: "50%" });
   const [ripples, setRipples] = useState<Ripple[]>([]);
@@ -127,7 +131,7 @@ export function MagneticButton({ children, variant = "ghost", disabled = false }
             initial={{ opacity: 0.55, scale: 0.2 }}
             animate={{ opacity: 0, scale: 2.1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+            transition={RIPPLE_TRANSITION}
             aria-hidden
           />
         ))}

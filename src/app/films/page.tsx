@@ -9,28 +9,29 @@ import { TextReveal } from "@/components/text-reveal";
 import { projects } from "@/content/projects";
 import { projectTaxonomyBySlug } from "@/content/project-taxonomy";
 
-export default function FilmsPage() {
-  type YearOption = "Recent" | "2025" | "2024";
-  type MoodOption = "All" | "Meditative" | "Energetic" | "Surreal";
-  type SubjectOption = "All" | "Faces" | "Hands" | "Landscape" | "Animals" | "Objects";
+type YearOption = "Recent" | "2025" | "2024";
+type MoodOption = "All" | "Meditative" | "Energetic" | "Surreal";
+type SubjectOption = "All" | "Faces" | "Hands" | "Landscape" | "Animals" | "Objects";
 
+const reelProjects = projects.filter((project) => Boolean(project.media.loopSrc));
+
+const isYearOption = (value: string): value is YearOption =>
+  value === "Recent" || value === "2025" || value === "2024";
+const isMoodOption = (value: string): value is MoodOption =>
+  value === "All" || value === "Meditative" || value === "Energetic" || value === "Surreal";
+const isSubjectOption = (value: string): value is SubjectOption =>
+  value === "All" ||
+  value === "Faces" ||
+  value === "Hands" ||
+  value === "Landscape" ||
+  value === "Animals" ||
+  value === "Objects";
+
+export default function FilmsPage() {
   const [year, setYear] = useState<YearOption>("Recent");
   const [mood, setMood] = useState<MoodOption>("All");
   const [subject, setSubject] = useState<SubjectOption>("All");
 
-  const isYearOption = (value: string): value is YearOption =>
-    value === "Recent" || value === "2025" || value === "2024";
-  const isMoodOption = (value: string): value is MoodOption =>
-    value === "All" || value === "Meditative" || value === "Energetic" || value === "Surreal";
-  const isSubjectOption = (value: string): value is SubjectOption =>
-    value === "All" ||
-    value === "Faces" ||
-    value === "Hands" ||
-    value === "Landscape" ||
-    value === "Animals" ||
-    value === "Objects";
-
-  const reelProjects = projects.filter((project) => Boolean(project.media.loopSrc));
   const filteredProjects = useMemo(() => {
     const result = reelProjects.filter((project) => {
       const tags = projectTaxonomyBySlug[project.slug];
@@ -48,7 +49,7 @@ export default function FilmsPage() {
       year === "Recent" ? withSubject : withSubject.filter((project) => project.year === year);
 
     return yearFiltered.sort((a, b) => Number(b.year) - Number(a.year));
-  }, [mood, reelProjects, subject, year]);
+  }, [mood, subject, year]);
 
   return (
     <StaggerContainer as="main" id="main-content" tabIndex={-1} className="top-spaced page-shell" kind="section">

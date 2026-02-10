@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useMotionValue, useSpring } from "framer-motion";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { MotionTier } from "@/components/psychedelic-background";
 
 interface CustomCursorProps {
@@ -18,6 +18,10 @@ interface Burst extends Point {
 }
 
 const TRAIL_COUNT = 6;
+const RING_SPRING = { stiffness: 320, damping: 28, mass: 0.25 };
+const DOT_SPRING = { stiffness: 640, damping: 40, mass: 0.12 };
+const BURST_TRANSITION = { duration: 0.42, ease: [0.23, 1, 0.32, 1] } as const;
+const TRAIL_PALETTE = ["var(--psych-pink)", "var(--psych-violet)", "var(--psych-cyan)", "var(--psych-gold)", "var(--psych-lime)", "#ffffff"];
 
 function isInteractive(target: EventTarget | null) {
   return target instanceof Element && Boolean(target.closest("a, button, input, textarea, select, [data-cursor-hit]"));
@@ -37,15 +41,10 @@ export function CustomCursor({ motionTier }: CustomCursorProps) {
 
   const mouseX = useMotionValue(-100);
   const mouseY = useMotionValue(-100);
-  const ringX = useSpring(mouseX, { stiffness: 320, damping: 28, mass: 0.25 });
-  const ringY = useSpring(mouseY, { stiffness: 320, damping: 28, mass: 0.25 });
-  const dotX = useSpring(mouseX, { stiffness: 640, damping: 40, mass: 0.12 });
-  const dotY = useSpring(mouseY, { stiffness: 640, damping: 40, mass: 0.12 });
-
-  const trailPalette = useMemo(
-    () => ["var(--psych-pink)", "var(--psych-violet)", "var(--psych-cyan)", "var(--psych-gold)", "var(--psych-lime)", "#ffffff"],
-    []
-  );
+  const ringX = useSpring(mouseX, RING_SPRING);
+  const ringY = useSpring(mouseY, RING_SPRING);
+  const dotX = useSpring(mouseX, DOT_SPRING);
+  const dotY = useSpring(mouseY, DOT_SPRING);
 
   useEffect(() => {
     if (motionTier !== "immersive") {
@@ -155,7 +154,7 @@ export function CustomCursor({ motionTier }: CustomCursorProps) {
           className="psych-cursor-trail"
           style={{
             opacity: Math.max(0.12, 0.85 - index * 0.13),
-            background: trailPalette[index % trailPalette.length]
+            background: TRAIL_PALETTE[index % TRAIL_PALETTE.length]
           }}
         />
       ))}
@@ -168,7 +167,7 @@ export function CustomCursor({ motionTier }: CustomCursorProps) {
             initial={{ opacity: 0.75, scale: 0.25 }}
             animate={{ opacity: 0, scale: 2.4 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.42, ease: [0.23, 1, 0.32, 1] }}
+            transition={BURST_TRANSITION}
           />
         ))}
       </AnimatePresence>

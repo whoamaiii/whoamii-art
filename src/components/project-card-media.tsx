@@ -204,6 +204,11 @@ export function ProjectCardMedia({
     }
 
     const drawFrame = () => {
+      if (document.hidden) {
+        frameRef.current = window.requestAnimationFrame(drawFrame);
+        return;
+      }
+
       const { width, height } = sizeRef.current;
       if (!width || !height) {
         frameRef.current = window.requestAnimationFrame(drawFrame);

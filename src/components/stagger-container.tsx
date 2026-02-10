@@ -21,6 +21,27 @@ interface StaggerItemProps {
 
 const StaggerKindContext = createContext<"grid" | "section">("grid");
 
+const SECTION_ITEM_VARIANTS = {
+  hidden: { y: 60, opacity: 0, filter: "blur(6px)", rotateX: 4 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    filter: "blur(0px)",
+    rotateX: 0,
+    transition: { duration: 0.62, ease: [0.23, 1, 0.32, 1] }
+  }
+} as const;
+
+const GRID_ITEM_VARIANTS = {
+  hidden: { y: 40, opacity: 0, filter: "blur(4px)" },
+  visible: {
+    y: 0,
+    opacity: 1,
+    filter: "blur(0px)",
+    transition: { duration: 0.56, ease: [0.23, 1, 0.32, 1] }
+  }
+} as const;
+
 export function StaggerContainer({
   children,
   className,
@@ -140,27 +161,7 @@ export function StaggerItem({ children, className }: StaggerItemProps) {
   const { motionTier } = usePerformanceMode();
   const kind = useContext(StaggerKindContext);
 
-  const variants =
-    kind === "section"
-      ? {
-          hidden: { y: 60, opacity: 0, filter: "blur(6px)", rotateX: 4 },
-          visible: {
-            y: 0,
-            opacity: 1,
-            filter: "blur(0px)",
-            rotateX: 0,
-            transition: { duration: 0.62, ease: [0.23, 1, 0.32, 1] }
-          }
-        }
-      : {
-          hidden: { y: 40, opacity: 0, filter: "blur(4px)" },
-          visible: {
-            y: 0,
-            opacity: 1,
-            filter: "blur(0px)",
-            transition: { duration: 0.56, ease: [0.23, 1, 0.32, 1] }
-          }
-        };
+  const variants = kind === "section" ? SECTION_ITEM_VARIANTS : GRID_ITEM_VARIANTS;
 
   if (motionTier === "lite") {
     return <div className={className}>{children}</div>;
