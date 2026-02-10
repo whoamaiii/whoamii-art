@@ -42,10 +42,10 @@ export function BeforeAfterReveal({ afterSrc, fallbackGradient, label }: BeforeA
       </p>
       {reducedMotion ? (
         <div className="work-actions">
-          <button type="button" className="ghost-button" onClick={() => setShowAfter(false)}>
+          <button type="button" className="ghost-button" onClick={() => setShowAfter(false)} data-cursor-hit>
             Show Before
           </button>
-          <button type="button" className="glow-button" onClick={() => setShowAfter(true)}>
+          <button type="button" className="glow-button" onClick={() => setShowAfter(true)} data-cursor-hit>
             Show After
           </button>
         </div>
@@ -73,6 +73,7 @@ export function BeforeAfterReveal({ afterSrc, fallbackGradient, label }: BeforeA
           max={99}
           value={position}
           aria-label="Reveal before and after"
+          data-cursor-hit
           onChange={(event) => setPosition(Number(event.target.value))}
         />
       )}

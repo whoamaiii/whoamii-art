@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { MagneticButton } from "@/components/magnetic-button";
 
 interface ProcessLayerToggleProps {
   layers: string[];
@@ -11,9 +12,11 @@ export function ProcessLayerToggle({ layers }: ProcessLayerToggleProps) {
 
   return (
     <section className="process-layer">
-      <button className="glow-button" type="button" onClick={() => setRevealed((value) => !value)}>
-        {revealed ? "Hide Process Layer" : "Reveal Process Layer"}
-      </button>
+      <MagneticButton variant="glow">
+        <button className="glow-button" type="button" onClick={() => setRevealed((value) => !value)}>
+          {revealed ? "Hide Process Layer" : "Reveal Process Layer"}
+        </button>
+      </MagneticButton>
       {revealed ? (
         <ol>
           {layers.map((layer) => (

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePerformanceMode } from "@/hooks/use-performance-mode";
+import { useVideoVisibilityPlayback } from "@/hooks/use-video-visibility-playback";
 
 interface ProjectMediaProps {
   loopSrc?: string;
@@ -19,15 +20,31 @@ export function ProjectMedia({
   mediaLabel = "Project media preview"
 }: ProjectMediaProps) {
   const [videoFailed, setVideoFailed] = useState(false);
+  const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
   const [inView, setInView] = useState(false);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
   const fallbackRef = useRef<HTMLDivElement | null>(null);
   const { shouldAutoplayMedia } = usePerformanceMode();
+  const hasLiveVideo = Boolean(loopSrc) && !videoFailed && shouldAutoplayMedia;
+
+  useVideoVisibilityPlayback({
+    videoElement,
+    shouldPlay: hasLiveVideo && inView
+  });
 
   useEffect(() => {
-    const target = loopSrc && !videoFailed && shouldAutoplayMedia ? videoRef.current : fallbackRef.current;
+    const target = hasLiveVideo ? videoElement : fallbackRef.current;
     if (!target) return;
-    const observer = new IntersectionObserver(
+
+    const intersectionObserverCtor = (
+      window as Window & { IntersectionObserver?: typeof IntersectionObserver }
+    ).IntersectionObserver;
+
+    if (!intersectionObserverCtor) {
+      setInView(true);
+      return;
+    }
+
+    const observer = new intersectionObserverCtor(
       (entries) => {
         const [entry] = entries;
         setInView(entry.isIntersecting);
@@ -36,9 +53,9 @@ export function ProjectMedia({
     );
     observer.observe(target);
     return () => observer.disconnect();
-  }, [loopSrc, shouldAutoplayMedia, videoFailed]);
+  }, [hasLiveVideo, videoElement]);
 
-  if (!loopSrc || videoFailed || !shouldAutoplayMedia) {
+  if (!hasLiveVideo) {
     return (
       <div
         ref={fallbackRef}
@@ -55,11 +72,10 @@ export function ProjectMedia({
 
   return (
     <video
-      ref={videoRef}
+      ref={setVideoElement}
       className={className}
       title={mediaLabel}
       aria-label={mediaLabel}
-      autoPlay={inView}
       muted
       loop
       playsInline

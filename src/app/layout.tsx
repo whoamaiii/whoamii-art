@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono, Manrope } from "next/font/google";
+import { PsychedelicRuntime } from "@/components/psychedelic-runtime";
 import { SiteNav } from "@/components/site-nav";
+import { PerformanceModeProvider } from "@/hooks/use-performance-mode";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -53,10 +55,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${manrope.variable} ${jetBrainsMono.variable}`}>
-        <SiteNav />
-        <div id="main-content" tabIndex={-1}>
+        <PerformanceModeProvider>
+          <PsychedelicRuntime />
+          <SiteNav />
           {children}
-        </div>
+        </PerformanceModeProvider>
       </body>
     </html>
   );

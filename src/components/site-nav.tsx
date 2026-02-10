@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { CSSProperties } from "react";
 
 const links = [
   { href: "/portal", label: "Portal" },
@@ -15,6 +16,7 @@ const links = [
 
 export function SiteNav() {
   const pathname = usePathname();
+  const logoLetters = "WHOAMIII".split("");
 
   return (
     <>
@@ -22,21 +24,30 @@ export function SiteNav() {
         Skip to main content
       </a>
       <header className="site-header">
-        <Link href="/portal" className="site-logo">
-          WHOAMIII
+        <Link href="/portal" className="site-logo" data-cursor-hit>
+          {logoLetters.map((letter, index) => (
+            <span
+              key={`${letter}-${index}`}
+              className="site-logo-letter"
+              style={{ "--logo-index": String(index) } as CSSProperties}
+            >
+              {letter}
+            </span>
+          ))}
         </Link>
         <nav className="site-nav" aria-label="Main navigation">
           {links.map((link) => {
             const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
             return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={isActive ? "nav-link nav-link-active" : "nav-link"}
-              aria-current={isActive ? "page" : undefined}
-            >
-              {link.label}
-            </Link>
+              <Link
+                key={link.href}
+                href={link.href}
+                className={isActive ? "nav-link nav-link-active" : "nav-link"}
+                aria-current={isActive ? "page" : undefined}
+                data-cursor-hit
+              >
+                {link.label}
+              </Link>
             );
           })}
         </nav>

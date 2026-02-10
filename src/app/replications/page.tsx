@@ -4,6 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ProjectCard } from "@/components/project-card";
 import { BeforeAfterReveal } from "@/components/before-after-reveal";
+import { MagneticButton } from "@/components/magnetic-button";
+import { StaggerContainer, StaggerItem } from "@/components/stagger-container";
+import { TextReveal } from "@/components/text-reveal";
 import { projects } from "@/content/projects";
 import {
   colorFilters,
@@ -18,6 +21,19 @@ export default function ReplicationsPage() {
   const [subject, setSubject] = useState<(typeof subjectFilters)[number]>("All");
   const [intensity, setIntensity] = useState<(typeof intensityFilters)[number]>("All");
   const [color, setColor] = useState<(typeof colorFilters)[number]>("All");
+  const techniqueOptions = new Set<string>(techniqueFilters);
+  const subjectOptions = new Set<string>(subjectFilters);
+  const intensityOptions = new Set<string>(intensityFilters);
+  const colorOptions = new Set<string>(colorFilters);
+
+  const isTechniqueOption = (value: string): value is (typeof techniqueFilters)[number] =>
+    techniqueOptions.has(value);
+  const isSubjectOption = (value: string): value is (typeof subjectFilters)[number] =>
+    subjectOptions.has(value);
+  const isIntensityOption = (value: string): value is (typeof intensityFilters)[number] =>
+    intensityOptions.has(value);
+  const isColorOption = (value: string): value is (typeof colorFilters)[number] =>
+    colorOptions.has(value);
 
   const filtered = useMemo(() => {
     return projects.filter((project) => {
@@ -46,90 +62,135 @@ export default function ReplicationsPage() {
   const focusProject = filtered.find((project) => project.slug === selectedSlug) ?? filtered[0];
 
   return (
-    <main className="top-spaced page-shell">
-      <section className="panel">
-        <p className="hero-kicker">Archive Entry</p>
-        <h1>/REPLICATIONS</h1>
-        <p>
-          Filterable archive of photography, geometry, hand-drawn studies, and hybrid composites.
-        </p>
-        <p className="project-kicker">FLOW: PORTAL → REPLICATIONS → FILMS → COMMISSIONS</p>
-        <p className="muted">Click any card to load its process study below.</p>
-        <div className="filter-wrap">
-          <label>
-            Technique
-            <select value={technique} onChange={(event) => setTechnique(event.target.value as never)}>
-              {techniqueFilters.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Subject
-            <select value={subject} onChange={(event) => setSubject(event.target.value as never)}>
-              {subjectFilters.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Intensity
-            <select value={intensity} onChange={(event) => setIntensity(event.target.value as never)}>
-              {intensityFilters.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Color
-            <select value={color} onChange={(event) => setColor(event.target.value as never)}>
-              {colorFilters.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-        <p className="project-kicker">{filtered.length} pieces matched</p>
-        <div className="portal-grid">
-          {filtered.map((project) => (
-            <ProjectCard
-              key={project.slug}
-              project={project}
-              selected={selectedSlug === project.slug}
-              onSelect={setSelectedSlug}
-            />
-          ))}
-        </div>
-      </section>
+    <StaggerContainer as="main" id="main-content" tabIndex={-1} className="top-spaced page-shell" kind="section">
+      <StaggerItem>
+        <section className="panel">
+          <p className="hero-kicker">Archive Entry</p>
+          <TextReveal text="/REPLICATIONS" as="h1" />
+          <p>
+            Filterable archive of photography, geometry, hand-drawn studies, and hybrid composites.
+          </p>
+          <p className="project-kicker">FLOW: PORTAL → REPLICATIONS → FILMS → COMMISSIONS</p>
+          <p className="muted">Click any card to load its process study below.</p>
+          <div className="filter-wrap">
+            <label>
+              Technique
+              <select
+                value={technique}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  if (isTechniqueOption(value)) {
+                    setTechnique(value);
+                  }
+                }}
+                data-cursor-hit
+              >
+                {techniqueFilters.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Subject
+              <select
+                value={subject}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  if (isSubjectOption(value)) {
+                    setSubject(value);
+                  }
+                }}
+                data-cursor-hit
+              >
+                {subjectFilters.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Intensity
+              <select
+                value={intensity}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  if (isIntensityOption(value)) {
+                    setIntensity(value);
+                  }
+                }}
+                data-cursor-hit
+              >
+                {intensityFilters.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Color
+              <select
+                value={color}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  if (isColorOption(value)) {
+                    setColor(value);
+                  }
+                }}
+                data-cursor-hit
+              >
+                {colorFilters.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <p className="project-kicker">{filtered.length} pieces matched</p>
+          <StaggerContainer className="portal-grid" kind="grid">
+            {filtered.map((project) => (
+              <StaggerItem key={project.slug}>
+                <ProjectCard
+                  project={project}
+                  selected={selectedSlug === project.slug}
+                  onSelect={setSelectedSlug}
+                />
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
+        </section>
+      </StaggerItem>
 
       {focusProject ? (
-        <section className="panel">
-          <p className="hero-kicker">Process Study</p>
-          <h2>{focusProject.title}</h2>
-          <p>{focusProject.oneLiner}</p>
-          <BeforeAfterReveal
-            afterSrc={focusProject.media.posterSrc}
-            fallbackGradient={focusProject.heroGradient}
-            label={focusProject.title}
-          />
-          <div className="work-actions">
-            <Link href={`/work/${focusProject.slug}`} className="ghost-button">
-              Open Full Project
-            </Link>
-            <Link href="/films" className="ghost-button">
-              Continue To Films
-            </Link>
-          </div>
-        </section>
+        <StaggerItem>
+          <section className="panel">
+            <p className="hero-kicker">Process Study</p>
+            <h2>{focusProject.title}</h2>
+            <p>{focusProject.oneLiner}</p>
+            <BeforeAfterReveal
+              afterSrc={focusProject.media.posterSrc}
+              fallbackGradient={focusProject.heroGradient}
+              label={focusProject.title}
+            />
+            <div className="work-actions">
+              <MagneticButton variant="ghost">
+                <Link href={`/work/${focusProject.slug}`} className="ghost-button" data-cursor-hit>
+                  Open Full Project
+                </Link>
+              </MagneticButton>
+              <MagneticButton variant="ghost">
+                <Link href="/films" className="ghost-button" data-cursor-hit>
+                  Continue To Films
+                </Link>
+              </MagneticButton>
+            </div>
+          </section>
+        </StaggerItem>
       ) : null}
-    </main>
+    </StaggerContainer>
   );
 }

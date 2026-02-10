@@ -1,0 +1,137 @@
+"use client";
+
+import { AnimatePresence, motion, useMotionValue, useSpring } from "framer-motion";
+import { cloneElement, useEffect, useMemo, useRef, useState } from "react";
+import type { PointerEvent as ReactPointerEvent } from "react";
+import { usePerformanceMode } from "@/hooks/use-performance-mode";
+
+interface MagneticButtonProps {
+  children: React.ReactElement<{ className?: string; children?: React.ReactNode }>;
+  variant?: "glow" | "ghost";
+  disabled?: boolean;
+}
+
+interface Ripple {
+  id: number;
+  x: number;
+  y: number;
+}
+
+function mergeClassName(...values: Array<string | undefined>) {
+  return values.filter(Boolean).join(" ");
+}
+
+export function MagneticButton({ children, variant = "ghost", disabled = false }: MagneticButtonProps) {
+  const { motionTier } = usePerformanceMode();
+  const movementScale = motionTier === "immersive" ? 0.32 : motionTier === "normal" ? 0.14 : 0;
+  const interactive = !disabled && movementScale > 0;
+
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const textX = useMotionValue(0);
+  const textY = useMotionValue(0);
+  const springX = useSpring(x, { stiffness: 380, damping: 28, mass: 0.24 });
+  const springY = useSpring(y, { stiffness: 380, damping: 28, mass: 0.24 });
+  const springTextX = useSpring(textX, { stiffness: 420, damping: 30, mass: 0.19 });
+  const springTextY = useSpring(textY, { stiffness: 420, damping: 30, mass: 0.19 });
+
+  const [glowPoint, setGlowPoint] = useState({ x: "50%", y: "50%" });
+  const [ripples, setRipples] = useState<Ripple[]>([]);
+  const rippleTimeoutsRef = useRef<number[]>([]);
+
+  useEffect(() => {
+    return () => {
+      for (const timeoutId of rippleTimeoutsRef.current) {
+        window.clearTimeout(timeoutId);
+      }
+      rippleTimeoutsRef.current = [];
+    };
+  }, []);
+
+  const childElement = useMemo(() => {
+    const childClass = mergeClassName(children.props.className, "magnetic-button-target", `magnetic-button-${variant}`);
+    return cloneElement(children, {
+      className: childClass,
+      children: (
+        <motion.span className="magnetic-button-inner" style={{ x: springTextX, y: springTextY }}>
+          {children.props.children}
+        </motion.span>
+      )
+    });
+  }, [children, springTextX, springTextY, variant]);
+
+  const reset = () => {
+    x.set(0);
+    y.set(0);
+    textX.set(0);
+    textY.set(0);
+  };
+
+  const onMove = (event: ReactPointerEvent<HTMLSpanElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const offsetX = event.clientX - rect.left;
+    const offsetY = event.clientY - rect.top;
+    const dx = offsetX - rect.width / 2;
+    const dy = offsetY - rect.height / 2;
+
+    setGlowPoint({ x: `${offsetX}px`, y: `${offsetY}px` });
+
+    if (!interactive) {
+      return;
+    }
+
+    x.set(dx * movementScale);
+    y.set(dy * movementScale);
+    textX.set(dx * movementScale * 0.5);
+    textY.set(dy * movementScale * 0.5);
+  };
+
+  const onClick = (event: ReactPointerEvent<HTMLSpanElement>) => {
+    if (disabled) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const ripple = {
+      id: Date.now() + Math.random(),
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top
+    };
+    setRipples((prev) => [...prev, ripple]);
+    const timeoutId = window.setTimeout(() => {
+      setRipples((prev) => prev.filter((entry) => entry.id !== ripple.id));
+      rippleTimeoutsRef.current = rippleTimeoutsRef.current.filter((id) => id !== timeoutId);
+    }, 420);
+    rippleTimeoutsRef.current.push(timeoutId);
+  };
+
+  return (
+    <motion.span
+      className={mergeClassName(
+        "magnetic-button-wrap",
+        `magnetic-wrap-${variant}`,
+        disabled ? "magnetic-button-disabled" : undefined
+      )}
+      style={interactive ? { x: springX, y: springY } : undefined}
+      onPointerMove={onMove}
+      onPointerLeave={reset}
+      onPointerCancel={reset}
+      onPointerDown={onClick}
+      data-motion-tier={motionTier}
+    >
+      <span className="magnetic-button-glow" style={{ left: glowPoint.x, top: glowPoint.y }} aria-hidden />
+      {childElement}
+      <AnimatePresence>
+        {ripples.map((ripple) => (
+          <motion.span
+            key={ripple.id}
+            className="magnetic-button-ripple"
+            style={{ left: ripple.x, top: ripple.y }}
+            initial={{ opacity: 0.55, scale: 0.2 }}
+            animate={{ opacity: 0, scale: 2.1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+            aria-hidden
+          />
+        ))}
+      </AnimatePresence>
+    </motion.span>
+  );
+}

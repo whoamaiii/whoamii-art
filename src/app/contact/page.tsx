@@ -1,6 +1,9 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { MagneticButton } from "@/components/magnetic-button";
+import { StaggerContainer, StaggerItem } from "@/components/stagger-container";
+import { TextReveal } from "@/components/text-reveal";
 import { contactMailHref, siteConfig } from "@/content/site";
 
 export default function ContactPage() {
@@ -46,48 +49,56 @@ export default function ContactPage() {
   }
 
   return (
-    <main className="top-spaced page-shell">
-      <section className="panel">
-        <h1>Contact</h1>
-        <p>Commissions, collaborations, festivals, and licensing inquiries.</p>
-        <form className="intake-form" onSubmit={handleSubmit}>
-          <input type="text" name="website" className="hp-input" autoComplete="off" tabIndex={-1} />
-          <label>
-            Name
-            <input type="text" name="name" required minLength={2} />
-          </label>
-          <label>
-            Email
-            <input type="email" name="email" required />
-          </label>
-          <label>
-            Subject
-            <input type="text" name="subject" required minLength={2} />
-          </label>
-          <label>
-            Message
-            <textarea name="message" rows={5} required minLength={10} />
-          </label>
-          <button className="glow-button" type="submit" disabled={status === "loading"}>
-            {status === "loading" ? "Sending..." : "Send Message"}
-          </button>
-        </form>
-        {message ? (
-          <p className={status === "error" ? "form-error" : "form-success"} role="status" aria-live="polite">
-            {message}
-          </p>
-        ) : null}
-        <div className="contact-actions">
-          {contactMailHref ? (
-            <a className="glow-button" href={contactMailHref}>
-              Email Studio
-            </a>
+    <StaggerContainer as="main" id="main-content" tabIndex={-1} className="top-spaced page-shell" kind="section">
+      <StaggerItem>
+        <section className="panel">
+          <TextReveal text="Contact" as="h1" />
+          <p>Commissions, collaborations, festivals, and licensing inquiries.</p>
+          <form className="intake-form" onSubmit={handleSubmit}>
+            <input type="text" name="website" className="hp-input" autoComplete="off" tabIndex={-1} />
+            <label>
+              Name
+              <input type="text" name="name" required minLength={2} data-cursor-hit />
+            </label>
+            <label>
+              Email
+              <input type="email" name="email" required data-cursor-hit />
+            </label>
+            <label>
+              Subject
+              <input type="text" name="subject" required minLength={2} data-cursor-hit />
+            </label>
+            <label>
+              Message
+              <textarea name="message" rows={5} required minLength={10} data-cursor-hit />
+            </label>
+            <MagneticButton variant="glow" disabled={status === "loading"}>
+              <button className="glow-button" type="submit" disabled={status === "loading"}>
+                {status === "loading" ? "Sending..." : "Send Message"}
+              </button>
+            </MagneticButton>
+          </form>
+          {message ? (
+            <p className={status === "error" ? "form-error" : "form-success"} role="status" aria-live="polite">
+              {message}
+            </p>
           ) : null}
-          <a className="ghost-button" href={siteConfig.instagramUrl} target="_blank" rel="noopener noreferrer">
-            Instagram
-          </a>
-        </div>
-      </section>
-    </main>
+          <div className="contact-actions">
+            {contactMailHref ? (
+              <MagneticButton variant="glow">
+                <a className="glow-button" href={contactMailHref} data-cursor-hit>
+                  Email Studio
+                </a>
+              </MagneticButton>
+            ) : null}
+            <MagneticButton variant="ghost">
+              <a className="ghost-button" href={siteConfig.instagramUrl} target="_blank" rel="noopener noreferrer" data-cursor-hit>
+                Instagram
+              </a>
+            </MagneticButton>
+          </div>
+        </section>
+      </StaggerItem>
+    </StaggerContainer>
   );
 }
