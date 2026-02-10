@@ -12,11 +12,7 @@ export default function PortalPage() {
     <main className="home-shell top-spaced">
       <section className="hero-zone">
         <p className="hero-kicker">{identitySystem.portalName}</p>
-        <h1>
-          QUENTIN
-          <br />
-          QMANN
-        </h1>
+        <h1>WHOAMIII</h1>
         <p className="lead">
           Psychedelic replication where sacred geometry meets human form.
         </p>

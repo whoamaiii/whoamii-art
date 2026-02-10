@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { projects } from "@/content/projects";
 
 export const metadata: Metadata = {
-  title: "Experiments | Quentin Qmann",
+  title: "Experiments | WHOAMIII",
   description: "Process lab featuring layer breakdowns and workflow insights."
 };
 

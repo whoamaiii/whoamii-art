@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Replications | Quentin Qmann",
+  title: "Replications | WHOAMIII",
   description:
     "Filterable archive of psychedelic replications across photography, drawing, and hybrid motion."
 };

@@ -23,7 +23,7 @@ export function SiteNav() {
       </a>
       <header className="site-header">
         <Link href="/portal" className="site-logo">
-          QUENTIN QMANN
+          WHOAMIII
         </Link>
         <nav className="site-nav" aria-label="Main navigation">
           {links.map((link) => {

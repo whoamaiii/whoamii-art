@@ -1,7 +1,7 @@
 import type { IdentitySystem } from "@/types/portfolio";
 
 export const identitySystem: IdentitySystem = {
-  portalName: "Quentin Qmann",
+  portalName: "WHOAMIII",
   tone: ["poetic", "cryptic", "ceremonial", "charged"],
   palette: {
     abyssBlack: "#0A0A0A",

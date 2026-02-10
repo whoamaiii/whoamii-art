@@ -18,12 +18,12 @@ export async function generateMetadata({ params }: WorkPageProps): Promise<Metad
 
   if (!project) {
     return {
-      title: "Work Not Found | Quentin Qmann"
+      title: "Work Not Found | WHOAMIII"
     };
   }
 
   return {
-    title: `${project.title} | Quentin Qmann`,
+    title: `${project.title} | WHOAMIII`,
     description: project.oneLiner
   };
 }

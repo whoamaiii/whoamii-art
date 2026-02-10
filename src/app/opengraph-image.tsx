@@ -31,7 +31,7 @@ export default function OpenGraphImage() {
             opacity: 0.88
           }}
         >
-          QUENTIN QMANN
+          WHOAMIII
         </p>
         <h1
           style={{

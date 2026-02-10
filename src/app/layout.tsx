@@ -15,31 +15,31 @@ const jetBrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://qmann.studio"),
-  title: "Quentin Qmann | Motion Portfolio",
+  title: "WHOAMIII | Motion Portfolio",
   description:
     "Psychedelic replication portfolio blending photography, geometry, and motion design.",
   alternates: {
     canonical: "/"
   },
   openGraph: {
-    title: "Quentin Qmann | Motion Portfolio",
+    title: "WHOAMIII | Motion Portfolio",
     description:
       "Psychedelic visual replication, drawing-to-motion pieces, pure craft edits, and spatial scans.",
     type: "website",
-    siteName: "Quentin Qmann",
+    siteName: "WHOAMIII",
     url: "https://qmann.studio",
     images: [
       {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "Quentin Qmann motion portfolio"
+        alt: "WHOAMIII motion portfolio"
       }
     ]
   },
   twitter: {
     card: "summary_large_image",
-    title: "Quentin Qmann | Motion Portfolio",
+    title: "WHOAMIII | Motion Portfolio",
     description: "Psychedelic replication visuals and motion work.",
     images: ["/opengraph-image"]
   }

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "About | Quentin Qmann",
-  description: "Artist statement, style genome, and workflow philosophy of Quentin Qmann."
+  title: "About | WHOAMIII",
+  description: "Artist statement, style genome, and workflow philosophy of WHOAMIII."
 };
 
 export default function AboutPage() {
@@ -11,7 +11,7 @@ export default function AboutPage() {
       <section className="panel">
         <h1>About</h1>
         <p>
-          Quentin Qmann is a motion artist working with psychedelic replication, sacred geometry, and
+          WHOAMIII is a motion artist working with psychedelic replication, sacred geometry, and
           bio-digital composites.
         </p>
         <p>
