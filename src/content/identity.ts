@@ -1,18 +1,18 @@
 import type { IdentitySystem } from "@/types/portfolio";
 
 export const identitySystem: IdentitySystem = {
-  portalName: "Inner Eye Signal",
+  portalName: "Quentin Qmann",
   tone: ["poetic", "cryptic", "ceremonial", "charged"],
   palette: {
-    abyssBlack: "#06060B",
-    plasmaViolet: "#7A3EFF",
-    toxicCyan: "#00F0D3",
-    emberMagenta: "#FF2DA0",
-    ghostWhite: "#EAE8FF"
+    abyssBlack: "#0A0A0A",
+    plasmaViolet: "#9D4EDD",
+    toxicCyan: "#00D4D4",
+    emberMagenta: "#FF6B35",
+    ghostWhite: "#F5F5F5"
   },
   typography: {
-    display: "Space Grotesk",
-    utility: "Inter"
+    display: "Manrope",
+    utility: "JetBrains Mono"
   },
   textureMotifs: [
     "chromatic bleed edges",

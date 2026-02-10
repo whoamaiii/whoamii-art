@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Contact | Inner Eye Signal",
+  title: "Contact | Quentin Qmann",
   description: "Contact Quentin Qmann for commissions, collaborations, and licensing inquiries."
 };
 

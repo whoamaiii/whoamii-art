@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Films | Inner Eye Signal",
+  title: "Films | Quentin Qmann",
   description: "Vertical-first reel gallery with mood-based discovery and loop previews."
 };
 

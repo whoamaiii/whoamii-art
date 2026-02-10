@@ -22,11 +22,12 @@ export interface ProjectTaxonomy {
 
 export const projectTaxonomyBySlug: Record<string, ProjectTaxonomy> = {
   "everywhere-i-seem-to-look": {
-    technique: "Hybrid",
-    subject: "Faces",
+    technique: "Photography + Overlay",
+    subject: "Hands",
     intensity: "Intense",
-    color: "Multi",
-    audioCredit: "Instagram Reel Audio",
+    color: "Warm",
+    audioCredit: "@SONIC_LABS",
+    bpm: 124,
     mood: "Surreal"
   },
   "bringing-my-drawings-to-life": {
@@ -41,6 +42,8 @@ export const projectTaxonomyBySlug: Record<string, ProjectTaxonomy> = {
     subject: "Faces",
     intensity: "Intense",
     color: "Warm",
+    audioCredit: "@NOISE_ARCH",
+    bpm: 110,
     mood: "Surreal"
   },
   "dump-dump": {
@@ -48,52 +51,56 @@ export const projectTaxonomyBySlug: Record<string, ProjectTaxonomy> = {
     subject: "Landscape",
     intensity: "Moderate",
     color: "Multi",
-    mood: "Abstract"
-  },
-  "cosmicbass-visual-teaser": {
-    technique: "Hybrid",
-    subject: "Objects",
-    intensity: "Intense",
-    color: "Warm",
-    audioCredit: "COSMICBASS Promo Cut",
+    audioCredit: "@DEEP_SPACE",
     bpm: 140,
     mood: "Energetic"
   },
+  "cosmicbass-visual-teaser": {
+    technique: "Hybrid",
+    subject: "Faces",
+    intensity: "Intense",
+    color: "Warm",
+    audioCredit: "@FUTURE_BEATS",
+    bpm: 98,
+    mood: "Energetic"
+  },
   "gausing-spatial-ritual-01": {
-    technique: "3D Render",
+    technique: "Photography + Overlay",
     subject: "Landscape",
     intensity: "Moderate",
-    color: "Cool",
-    mood: "Abstract"
-  },
-  "gausing-spatial-ritual-02": {
-    technique: "3D Render",
-    subject: "Landscape",
-    intensity: "Meditative",
     color: "Cool",
     mood: "Meditative"
   },
-  "drawn-serpent-morph": {
-    technique: "Hand-Drawn",
-    subject: "Objects",
-    intensity: "Intense",
-    color: "Warm",
-    mood: "Surreal"
-  },
-  "paper-glyph-orbit": {
-    technique: "Hand-Drawn",
-    subject: "Objects",
+  "gausing-spatial-ritual-02": {
+    technique: "Photography + Overlay",
+    subject: "Hands",
     intensity: "Moderate",
-    color: "Cool",
-    mood: "Abstract"
+    color: "Warm",
+    mood: "Meditative"
   },
-  "aftereffects-only-trance": {
+  "drawn-serpent-morph": {
     technique: "Hybrid",
     subject: "Faces",
     intensity: "Moderate",
     color: "Cool",
+    mood: "Surreal"
+  },
+  "paper-glyph-orbit": {
+    technique: "Photography + Overlay",
+    subject: "Faces",
+    intensity: "Meditative",
+    color: "Cool",
+    audioCredit: "@TECHNO_MIN",
+    bpm: 85,
+    mood: "Meditative"
+  },
+  "aftereffects-only-trance": {
+    technique: "Hybrid",
+    subject: "Animals",
+    intensity: "Moderate",
+    color: "Cool",
     bpm: 128,
-    mood: "Energetic"
+    mood: "Surreal"
   },
   "blender-only-radiant-cave": {
     technique: "3D Render",
@@ -103,16 +110,16 @@ export const projectTaxonomyBySlug: Record<string, ProjectTaxonomy> = {
     mood: "Meditative"
   },
   "replication-signal-v1": {
-    technique: "Photography + Overlay",
+    technique: "Hand-Drawn",
     subject: "Faces",
     intensity: "Intense",
     color: "Warm",
-    mood: "Surreal"
+    mood: "Energetic"
   },
   "replication-signal-v2": {
     technique: "Photography + Overlay",
-    subject: "Faces",
-    intensity: "Intense",
+    subject: "Hands",
+    intensity: "Moderate",
     color: "Multi",
     mood: "Surreal"
   },

@@ -1,70 +1,104 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { ProjectMedia } from "@/components/project-media";
 import { projects } from "@/content/projects";
 import { projectTaxonomyBySlug } from "@/content/project-taxonomy";
 
 export default function FilmsPage() {
-  const [mood, setMood] = useState<"All" | "Meditative" | "Energetic" | "Surreal" | "Abstract">("All");
-  const [sortMode, setSortMode] = useState<"Recent" | "Oldest">("Recent");
+  const [year, setYear] = useState<"Recent" | "2025" | "2024">("Recent");
+  const [mood, setMood] = useState<"All" | "Meditative" | "Energetic" | "Surreal">("All");
+  const [subject, setSubject] = useState<"All" | "Faces" | "Hands" | "Landscape" | "Animals" | "Objects">(
+    "All"
+  );
 
   const reelProjects = projects.filter((project) => Boolean(project.media.loopSrc));
   const filteredProjects = useMemo(() => {
-    const withMood = reelProjects.filter((project) => {
+    const result = reelProjects.filter((project) => {
       const tags = projectTaxonomyBySlug[project.slug];
       if (mood === "All") return true;
       return tags?.mood === mood;
     });
-    return withMood.sort((a, b) => {
-      if (sortMode === "Recent") return Number(b.year) - Number(a.year);
-      return Number(a.year) - Number(b.year);
+
+    const withSubject = result.filter((project) => {
+      const tags = projectTaxonomyBySlug[project.slug];
+      if (subject === "All") return true;
+      return tags?.subject === subject;
     });
-  }, [mood, reelProjects, sortMode]);
+
+    const yearFiltered =
+      year === "Recent" ? withSubject : withSubject.filter((project) => project.year === year);
+
+    return yearFiltered.sort((a, b) => Number(b.year) - Number(a.year));
+  }, [mood, reelProjects, subject, year]);
 
   return (
     <main className="top-spaced page-shell">
       <section className="panel">
-        <h1>Films</h1>
-        <p>Loop-first reel gallery with mood, audio, and rhythm context.</p>
+        <p className="hero-kicker">Vertical Motion Archive</p>
+        <h1>/FILMS</h1>
+        <p>Loop-first reel gallery with chronology, mood, and subject metadata.</p>
+        <p className="project-kicker">FLOW: PORTAL → REPLICATIONS → FILMS → COMMISSIONS</p>
         <div className="filter-wrap">
+          <label>
+            Chronology
+            <select value={year} onChange={(event) => setYear(event.target.value as typeof year)}>
+              <option value="Recent">Recent</option>
+              <option value="2025">2025</option>
+              <option value="2024">2024</option>
+            </select>
+          </label>
           <label>
             Mood
             <select value={mood} onChange={(event) => setMood(event.target.value as typeof mood)}>
-              <option value="All">All</option>
+              <option value="All">All moods</option>
               <option value="Meditative">Meditative</option>
               <option value="Energetic">Energetic</option>
               <option value="Surreal">Surreal</option>
-              <option value="Abstract">Abstract</option>
             </select>
           </label>
           <label>
-            Sort
-            <select
-              value={sortMode}
-              onChange={(event) => setSortMode(event.target.value as typeof sortMode)}
-            >
-              <option value="Recent">Recent</option>
-              <option value="Oldest">Oldest</option>
+            Subject
+            <select value={subject} onChange={(event) => setSubject(event.target.value as typeof subject)}>
+              <option value="All">All subjects</option>
+              <option value="Faces">Face-Eye</option>
+              <option value="Hands">Hand</option>
+              <option value="Landscape">Landscape</option>
+              <option value="Animals">Animal</option>
+              <option value="Objects">Object</option>
             </select>
           </label>
         </div>
+        <p className="project-kicker">{filteredProjects.length} reels visible</p>
         <div className="film-grid">
           {filteredProjects.map((project) => {
             const tags = projectTaxonomyBySlug[project.slug];
             return (
               <article key={project.slug} className="film-card">
-                <ProjectMedia
-                  className="film-frame"
-                  loopSrc={project.media.loopSrc}
-                  posterSrc={project.media.posterSrc}
-                  gradientFallback={project.heroGradient}
-                />
-                <h3>{project.title}</h3>
-                <p className="muted">
-                  {project.year} - {project.duration} - {tags?.mood ?? "Surreal"}
-                </p>
-                <p className="muted">{tags?.audioCredit ?? "Original Reel Audio"}</p>
+                <Link href={`/work/${project.slug}`}>
+                  <ProjectMedia
+                    className="film-frame"
+                    loopSrc={project.media.loopSrc}
+                    posterSrc={project.media.posterSrc}
+                    gradientFallback={project.heroGradient}
+                  />
+                </Link>
+                <h3>{project.title.toUpperCase()}</h3>
+                <div className="chip-row">
+                  <span className="chip">Duration {project.duration}</span>
+                  {tags?.bpm ? <span className="chip">BPM {tags.bpm}</span> : null}
+                  <span className="chip">{project.year}</span>
+                </div>
+                <p className="muted">{tags?.audioCredit ?? "Credit pending"}</p>
+                <div className="work-actions">
+                  <Link href={`/work/${project.slug}`} className="ghost-button">
+                    Open Study
+                  </Link>
+                  <Link href="/commissions" className="glow-button">
+                    Commission Similar
+                  </Link>
+                </div>
               </article>
             );
           })}

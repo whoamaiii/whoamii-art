@@ -1,33 +1,33 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { JetBrains_Mono, Manrope } from "next/font/google";
 import { SiteNav } from "@/components/site-nav";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const manrope = Manrope({
+  variable: "--font-manrope",
   subsets: ["latin"]
 });
 
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
+const jetBrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains",
   subsets: ["latin"]
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://qmann.studio"),
-  title: "Inner Eye Signal | Quentin Thiessen",
+  title: "Quentin Qmann | Motion Portfolio",
   description:
-    "Immersive psychedelic portfolio built from drawings, scans, code, and hallucinated light.",
+    "Psychedelic replication portfolio blending photography, geometry, and motion design.",
   openGraph: {
-    title: "Inner Eye Signal | Quentin Thiessen",
+    title: "Quentin Qmann | Motion Portfolio",
     description:
       "Psychedelic visual replication, drawing-to-motion pieces, pure craft edits, and spatial scans.",
     type: "website",
-    siteName: "Inner Eye Signal"
+    siteName: "Quentin Qmann"
   },
   twitter: {
     card: "summary_large_image",
-    title: "Inner Eye Signal | Quentin Thiessen",
+    title: "Quentin Qmann | Motion Portfolio",
     description: "Psychedelic replication visuals and motion work."
   }
 };
@@ -39,9 +39,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${spaceGrotesk.variable}`}>
+      <body className={`${manrope.variable} ${jetBrainsMono.variable}`}>
         <SiteNav />
-        {children}
+        <div id="main-content" role="main" tabIndex={-1}>
+          {children}
+        </div>
       </body>
     </html>
   );

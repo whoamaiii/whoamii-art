@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { projects } from "@/content/projects";
 
 export const metadata: Metadata = {
-  title: "Experiments | Inner Eye Signal",
+  title: "Experiments | Quentin Qmann",
   description: "Process lab featuring layer breakdowns and workflow insights."
 };
 
@@ -15,7 +15,7 @@ export default function ExperimentsPage() {
       <section className="panel">
         <h1>Experiments / Process Lab</h1>
         <p>
-          Layer-by-layer reveals for how your replication pieces are constructed from capture to final
+          Layer-by-layer reveals for how each replication piece is constructed from capture to final
           composite.
         </p>
       </section>

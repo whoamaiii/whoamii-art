@@ -18,12 +18,12 @@ export async function generateMetadata({ params }: WorkPageProps): Promise<Metad
 
   if (!project) {
     return {
-      title: "Work Not Found | Inner Eye Signal"
+      title: "Work Not Found | Quentin Qmann"
     };
   }
 
   return {
-    title: `${project.title} | Inner Eye Signal`,
+    title: `${project.title} | Quentin Qmann`,
     description: project.oneLiner
   };
 }
@@ -47,9 +47,7 @@ export default async function WorkDetailPage({ params }: WorkPageProps) {
           posterSrc={project.media.posterSrc}
         />
         <div className="work-hero-overlay">
-          <p className="project-kicker">
-            {project.category} - {project.year} - {project.duration}
-          </p>
+          <p className="project-kicker">{project.category} - {project.year} - {project.duration}</p>
           <h1>{project.title}</h1>
           <p>{project.oneLiner}</p>
           <div className="chip-row">
@@ -64,7 +62,7 @@ export default async function WorkDetailPage({ params }: WorkPageProps) {
 
       <section className="work-content">
         <article>
-          <h2>Intent</h2>
+          <h2>Artist Note</h2>
           <p>
             This piece is part of the {project.category} stream, where source textures and symbolic
             forms are transformed into cinematic loops with an emotional center.
@@ -102,16 +100,22 @@ export default async function WorkDetailPage({ params }: WorkPageProps) {
         <ProcessLayerToggle layers={project.processLayers} />
 
         <div className="work-actions">
-          <Link href="/portal" className="ghost-button">
-            Back To Portal
+          <Link href="/replications" className="ghost-button">
+            Back To Replications
+          </Link>
+          <Link href="/films" className="ghost-button">
+            Continue To Films
+          </Link>
+          <Link href="/commissions" className="ghost-button">
+            Commission A Vision
           </Link>
           {contactMailHref ? (
             <a className="glow-button" href={contactMailHref}>
-              Request Similar Work
+              Inquire For Collection
             </a>
           ) : (
             <a className="glow-button" href={siteConfig.instagramUrl} target="_blank" rel="noreferrer">
-              Request via Instagram
+              Inquire Via Instagram
             </a>
           )}
         </div>

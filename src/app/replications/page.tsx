@@ -1,7 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { ProjectCard } from "@/components/project-card";
+import { BeforeAfterReveal } from "@/components/before-after-reveal";
 import { projects } from "@/content/projects";
 import {
   colorFilters,
@@ -29,14 +31,30 @@ export default function ReplicationsPage() {
     });
   }, [color, intensity, subject, technique]);
 
+  const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (filtered.length === 0) {
+      setSelectedSlug(null);
+      return;
+    }
+    if (!selectedSlug || !filtered.some((project) => project.slug === selectedSlug)) {
+      setSelectedSlug(filtered[0].slug);
+    }
+  }, [filtered, selectedSlug]);
+
+  const focusProject = filtered.find((project) => project.slug === selectedSlug) ?? filtered[0];
+
   return (
     <main className="top-spaced page-shell">
       <section className="panel">
-        <h1>Replications</h1>
+        <p className="hero-kicker">Archive Entry</p>
+        <h1>/REPLICATIONS</h1>
         <p>
-          Selected works showing the convergence of photography, geometry, drawing, and digital
-          synthesis.
+          Filterable archive of photography, geometry, hand-drawn studies, and hybrid composites.
         </p>
+        <p className="project-kicker">FLOW: PORTAL → REPLICATIONS → FILMS → COMMISSIONS</p>
+        <p className="muted">Click any card to load its process study below.</p>
         <div className="filter-wrap">
           <label>
             Technique
@@ -79,13 +97,39 @@ export default function ReplicationsPage() {
             </select>
           </label>
         </div>
-        <p className="muted">{filtered.length} pieces matched</p>
+        <p className="project-kicker">{filtered.length} pieces matched</p>
         <div className="portal-grid">
           {filtered.map((project) => (
-            <ProjectCard key={project.slug} project={project} />
+            <ProjectCard
+              key={project.slug}
+              project={project}
+              selected={selectedSlug === project.slug}
+              onSelect={setSelectedSlug}
+            />
           ))}
         </div>
       </section>
+
+      {focusProject ? (
+        <section className="panel">
+          <p className="hero-kicker">Process Study</p>
+          <h2>{focusProject.title}</h2>
+          <p>{focusProject.oneLiner}</p>
+          <BeforeAfterReveal
+            afterSrc={focusProject.media.posterSrc}
+            fallbackGradient={focusProject.heroGradient}
+            label={focusProject.title}
+          />
+          <div className="work-actions">
+            <Link href={`/work/${focusProject.slug}`} className="ghost-button">
+              Open Full Project
+            </Link>
+            <Link href="/films" className="ghost-button">
+              Continue To Films
+            </Link>
+          </div>
+        </section>
+      ) : null}
     </main>
   );
 }

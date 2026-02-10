@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Portal | Inner Eye Signal",
+  title: "Portal | Quentin Qmann",
   description: "Entry point into Quentin Qmann's immersive psychedelic portfolio."
 };
 

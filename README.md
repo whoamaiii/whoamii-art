@@ -1,6 +1,6 @@
-# Inner Eye Signal Portfolio
+# Quentin Qmann Portfolio
 
-High-intensity portfolio site for Quentin Thiessen's psychedelic visual practice.
+High-intensity portfolio site for Quentin Qmann's psychedelic visual practice.
 
 ## Stack
 
@@ -22,7 +22,6 @@ High-intensity portfolio site for Quentin Thiessen's psychedelic visual practice
 
 - `src/app/page.tsx` - Portal homepage (`World`, `Works`, `Experiments`, `Live`, `Contact`)
 - `src/app/work/[slug]/page.tsx` - Dynamic project detail route
-- `src/components/portal-background.tsx` - Animated atmosphere layer
 - `src/components/project-media.tsx` - Video/poster rendering with fallback gradient
 - `src/components/project-card.tsx` - Project preview card
 - `src/components/process-layer-toggle.tsx` - Behind-the-scenes reveal module
@@ -52,6 +51,12 @@ For each project slug in `src/content/projects.ts`, add:
 - Poster image: `public/media/posters/<slug>.jpg`
 
 If media is missing, the UI falls back to the project's gradient hero.
+
+## Data Safety Note
+
+- Keep raw exports, scraped data, and source archives outside `public/`.
+- Anything inside `public/` is directly web-accessible in production.
+- Store private/raw datasets in a non-public directory (for example `data/`).
 
 ## Development
 

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "About | Inner Eye Signal",
+  title: "About | Quentin Qmann",
   description: "Artist statement, style genome, and workflow philosophy of Quentin Qmann."
 };
 
