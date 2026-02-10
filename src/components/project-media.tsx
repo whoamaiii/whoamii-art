@@ -8,9 +8,16 @@ interface ProjectMediaProps {
   posterSrc?: string;
   gradientFallback: string;
   className?: string;
+  mediaLabel?: string;
 }
 
-export function ProjectMedia({ loopSrc, posterSrc, gradientFallback, className }: ProjectMediaProps) {
+export function ProjectMedia({
+  loopSrc,
+  posterSrc,
+  gradientFallback,
+  className,
+  mediaLabel = "Project media preview"
+}: ProjectMediaProps) {
   const [videoFailed, setVideoFailed] = useState(false);
   const [inView, setInView] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -50,6 +57,8 @@ export function ProjectMedia({ loopSrc, posterSrc, gradientFallback, className }
     <video
       ref={videoRef}
       className={className}
+      title={mediaLabel}
+      aria-label={mediaLabel}
       autoPlay={inView}
       muted
       loop

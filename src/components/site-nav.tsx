@@ -25,20 +25,20 @@ export function SiteNav() {
         <Link href="/portal" className="site-logo">
           QUENTIN QMANN
         </Link>
-        <nav className="site-nav">
-          {links.map((link) => (
+        <nav className="site-nav" aria-label="Main navigation">
+          {links.map((link) => {
+            const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
+            return (
             <Link
               key={link.href}
               href={link.href}
-              className={
-                pathname === link.href || pathname.startsWith(`${link.href}/`)
-                  ? "nav-link nav-link-active"
-                  : "nav-link"
-              }
+              className={isActive ? "nav-link nav-link-active" : "nav-link"}
+              aria-current={isActive ? "page" : undefined}
             >
               {link.label}
             </Link>
-          ))}
+            );
+          })}
         </nav>
       </header>
     </>

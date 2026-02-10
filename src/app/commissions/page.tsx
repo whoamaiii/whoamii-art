@@ -23,11 +23,18 @@ export default function CommissionsPage() {
       website: String(form.get("website") || "")
     };
 
-    const response = await fetch("/api/commissions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
+    let response: Response;
+    try {
+      response = await fetch("/api/commissions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+    } catch {
+      setStatus("error");
+      setMessage("Network error. Please try again or use email/Instagram.");
+      return;
+    }
     const data = (await response.json().catch(() => ({}))) as { errors?: string[] };
     if (!response.ok) {
       setStatus("error");
@@ -128,7 +135,12 @@ export default function CommissionsPage() {
             Send Intake By Email
           </a>
         ) : (
-          <a className="ghost-button" href={siteConfig.instagramUrl} target="_blank" rel="noreferrer">
+          <a
+            className="ghost-button"
+            href={siteConfig.instagramUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Inquire via Instagram DM
           </a>
         )}

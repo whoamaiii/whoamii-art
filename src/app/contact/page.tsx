@@ -21,11 +21,18 @@ export default function ContactPage() {
       website: String(form.get("website") || "")
     };
 
-    const response = await fetch("/api/contact", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
+    let response: Response;
+    try {
+      response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+    } catch {
+      setStatus("error");
+      setMessage("Network error. Please try again or reach out via email/Instagram.");
+      return;
+    }
     const data = (await response.json().catch(() => ({}))) as { errors?: string[] };
     if (!response.ok) {
       setStatus("error");
@@ -65,14 +72,18 @@ export default function ContactPage() {
             {status === "loading" ? "Sending..." : "Send Message"}
           </button>
         </form>
-        {message ? <p className={status === "error" ? "form-error" : "form-success"}>{message}</p> : null}
+        {message ? (
+          <p className={status === "error" ? "form-error" : "form-success"} role="status" aria-live="polite">
+            {message}
+          </p>
+        ) : null}
         <div className="contact-actions">
           {contactMailHref ? (
             <a className="glow-button" href={contactMailHref}>
               Email Studio
             </a>
           ) : null}
-          <a className="ghost-button" href={siteConfig.instagramUrl} target="_blank" rel="noreferrer">
+          <a className="ghost-button" href={siteConfig.instagramUrl} target="_blank" rel="noopener noreferrer">
             Instagram
           </a>
         </div>

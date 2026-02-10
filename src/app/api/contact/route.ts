@@ -18,13 +18,21 @@ export async function POST(request: Request) {
     );
   }
 
-  await resend.emails.send({
-    from: config.from,
-    to: [config.to],
-    subject: `[Portfolio Contact] ${data.subject}`,
-    replyTo: data.email,
-    text: `Name: ${data.name}\nEmail: ${data.email}\n\n${data.message}`
-  });
+  try {
+    await resend.emails.send({
+      from: config.from,
+      to: [config.to],
+      subject: `[Portfolio Contact] ${data.subject}`,
+      replyTo: data.email,
+      text: `Name: ${data.name}\nEmail: ${data.email}\n\n${data.message}`
+    });
+  } catch (error) {
+    console.error("Contact email send failed", error);
+    return NextResponse.json(
+      { ok: false, errors: ["Email delivery failed. Please try again shortly."] },
+      { status: 502 }
+    );
+  }
 
   return NextResponse.json({ ok: true });
 }

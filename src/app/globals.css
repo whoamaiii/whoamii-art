@@ -83,6 +83,7 @@ h1 {
   flex-wrap: wrap;
   gap: 0.6rem 1.2rem;
   justify-content: flex-end;
+  scrollbar-width: thin;
 }
 
 .nav-link {
@@ -169,6 +170,12 @@ h1 {
   max-width: 720px;
 }
 
+.lead-soft {
+  color: rgba(245, 245, 245, 0.6);
+  font-size: clamp(0.9rem, 1.8vw, 1.05rem);
+  margin-top: 0.8rem;
+}
+
 .hero-actions,
 .work-actions,
 .contact-actions {
@@ -180,6 +187,31 @@ h1 {
 
 .hero-actions {
   justify-content: center;
+}
+
+.hero-stats {
+  display: grid;
+  gap: 0.7rem;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  margin: 1.2rem auto 0;
+  max-width: 760px;
+}
+
+.hero-stats article {
+  background: rgba(17, 17, 19, 0.8);
+  border: 1px solid var(--line);
+  border-radius: 0.7rem;
+  padding: 0.7rem;
+}
+
+.hero-stats p {
+  margin: 0;
+}
+
+.hero-stats p:last-child {
+  font-size: 1.55rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 .glow-button,
@@ -601,6 +633,12 @@ h1 {
   }
 
   .site-nav {
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
     justify-content: flex-start;
+    max-width: 100%;
+    overflow-x: auto;
+    padding-bottom: 0.2rem;
+    width: 100%;
   }
 }

@@ -62,11 +62,11 @@ export default function FilmsPage() {
             Subject
             <select value={subject} onChange={(event) => setSubject(event.target.value as typeof subject)}>
               <option value="All">All subjects</option>
-              <option value="Faces">Face-Eye</option>
-              <option value="Hands">Hand</option>
+              <option value="Faces">Faces</option>
+              <option value="Hands">Hands</option>
               <option value="Landscape">Landscape</option>
-              <option value="Animals">Animal</option>
-              <option value="Objects">Object</option>
+              <option value="Animals">Animals</option>
+              <option value="Objects">Objects</option>
             </select>
           </label>
         </div>
@@ -82,6 +82,7 @@ export default function FilmsPage() {
                     loopSrc={project.media.loopSrc}
                     posterSrc={project.media.posterSrc}
                     gradientFallback={project.heroGradient}
+                    mediaLabel={`${project.title} film preview`}
                   />
                 </Link>
                 <h3>{project.title.toUpperCase()}</h3>

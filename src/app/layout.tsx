@@ -18,17 +18,30 @@ export const metadata: Metadata = {
   title: "Quentin Qmann | Motion Portfolio",
   description:
     "Psychedelic replication portfolio blending photography, geometry, and motion design.",
+  alternates: {
+    canonical: "/"
+  },
   openGraph: {
     title: "Quentin Qmann | Motion Portfolio",
     description:
       "Psychedelic visual replication, drawing-to-motion pieces, pure craft edits, and spatial scans.",
     type: "website",
-    siteName: "Quentin Qmann"
+    siteName: "Quentin Qmann",
+    url: "https://qmann.studio",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "Quentin Qmann motion portfolio"
+      }
+    ]
   },
   twitter: {
     card: "summary_large_image",
     title: "Quentin Qmann | Motion Portfolio",
-    description: "Psychedelic replication visuals and motion work."
+    description: "Psychedelic replication visuals and motion work.",
+    images: ["/opengraph-image"]
   }
 };
 
@@ -41,7 +54,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${manrope.variable} ${jetBrainsMono.variable}`}>
         <SiteNav />
-        <div id="main-content" role="main" tabIndex={-1}>
+        <div id="main-content" tabIndex={-1}>
           {children}
         </div>
       </body>

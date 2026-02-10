@@ -18,15 +18,23 @@ export async function POST(request: Request) {
     );
   }
 
-  await resend.emails.send({
-    from: config.from,
-    to: [config.to],
-    subject: `[Portfolio Commission] ${data.name} - ${data.budget}`,
-    replyTo: data.email,
-    text:
-      `Name: ${data.name}\nEmail: ${data.email}\nBudget: ${data.budget}\nTimeline: ${data.timeline}\n` +
-      `References: ${data.references || "None"}\n\nConcept:\n${data.idea}`
-  });
+  try {
+    await resend.emails.send({
+      from: config.from,
+      to: [config.to],
+      subject: `[Portfolio Commission] ${data.name} - ${data.budget}`,
+      replyTo: data.email,
+      text:
+        `Name: ${data.name}\nEmail: ${data.email}\nBudget: ${data.budget}\nTimeline: ${data.timeline}\n` +
+        `References: ${data.references || "None"}\n\nConcept:\n${data.idea}`
+    });
+  } catch (error) {
+    console.error("Commission email send failed", error);
+    return NextResponse.json(
+      { ok: false, errors: ["Email delivery failed. Please try again shortly."] },
+      { status: 502 }
+    );
+  }
 
   return NextResponse.json({ ok: true });
 }

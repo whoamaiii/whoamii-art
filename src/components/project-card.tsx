@@ -24,6 +24,7 @@ export function ProjectCard({ project, onSelect, selected = false }: ProjectCard
         gradientFallback={project.heroGradient}
         loopSrc={shouldShowVideo ? project.media.loopSrc : undefined}
         posterSrc={project.media.posterSrc}
+        mediaLabel={`${project.title} preview`}
       />
       <div className="project-card-content">
         <p className="project-kicker">ID_{project.slug.slice(0, 3).toUpperCase()}</p>

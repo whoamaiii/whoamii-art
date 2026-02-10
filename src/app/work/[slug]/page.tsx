@@ -45,6 +45,7 @@ export default async function WorkDetailPage({ params }: WorkPageProps) {
           gradientFallback={project.heroGradient}
           loopSrc={project.media.loopSrc}
           posterSrc={project.media.posterSrc}
+          mediaLabel={`${project.title} hero media`}
         />
         <div className="work-hero-overlay">
           <p className="project-kicker">{project.category} - {project.year} - {project.duration}</p>
@@ -114,7 +115,12 @@ export default async function WorkDetailPage({ params }: WorkPageProps) {
               Inquire For Collection
             </a>
           ) : (
-            <a className="glow-button" href={siteConfig.instagramUrl} target="_blank" rel="noreferrer">
+            <a
+              className="glow-button"
+              href={siteConfig.instagramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Inquire Via Instagram
             </a>
           )}
