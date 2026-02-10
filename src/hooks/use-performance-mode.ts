@@ -14,10 +14,10 @@ interface PerformanceMode {
 }
 
 const defaultPerformanceMode: PerformanceMode = {
-  reducedMotion: true,
-  lowPowerDevice: true,
-  motionScale: 0,
-  motionTier: "lite",
+  reducedMotion: false,
+  lowPowerDevice: false,
+  motionScale: 0.5,
+  motionTier: "normal",
   shouldAutoplayMedia: false,
   resolved: false
 };
@@ -25,8 +25,8 @@ const defaultPerformanceMode: PerformanceMode = {
 const PerformanceModeContext = createContext<PerformanceMode>(defaultPerformanceMode);
 
 function usePerformanceModeState(): PerformanceMode {
-  const [reducedMotion, setReducedMotion] = useState(true);
-  const [lowPowerDevice, setLowPowerDevice] = useState(true);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [lowPowerDevice, setLowPowerDevice] = useState(false);
   const [resolved, setResolved] = useState(false);
 
   useEffect(() => {
@@ -41,8 +41,29 @@ function usePerformanceModeState(): PerformanceMode {
 
     const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
     const cores = navigator.hardwareConcurrency ?? 8;
-    setLowPowerDevice(memory <= 4 || cores <= 4);
+    const inferredLowPowerDevice = memory <= 4 || cores <= 4;
+    setLowPowerDevice(inferredLowPowerDevice);
     setResolved(true);
+
+    // #region agent log H1 performance mode resolve
+    fetch("http://127.0.0.1:7242/ingest/ff9c1328-0a4a-45f8-8ea5-81952b6584c2", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        runId: "initial",
+        hypothesisId: "H1",
+        location: "src/hooks/use-performance-mode.ts:32",
+        message: "Performance mode resolved",
+        data: {
+          reducedMotionPreferred: mediaQuery.matches,
+          deviceMemory: memory,
+          hardwareConcurrency: cores,
+          inferredLowPowerDevice
+        },
+        timestamp: Date.now()
+      })
+    }).catch(() => {});
+    // #endregion
 
     return () => {
       if (typeof mediaQuery.removeEventListener === "function") {
@@ -54,17 +75,17 @@ function usePerformanceModeState(): PerformanceMode {
   }, []);
 
   const motionScale = useMemo(() => {
-    if (!resolved) return 0;
+    if (!resolved) return 0.5;
     if (reducedMotion) return 0;
     if (lowPowerDevice) return 0.5;
     return 1;
   }, [lowPowerDevice, reducedMotion, resolved]);
 
   const motionTier = useMemo<PerformanceMode["motionTier"]>(() => {
-    if (!resolved) return "lite";
+    if (!resolved) return "normal";
     if (reducedMotion) return "lite";
     if (lowPowerDevice) return "normal";
-    return "immersive";
+    return "normal";
   }, [lowPowerDevice, reducedMotion, resolved]);
 
   return {

@@ -63,10 +63,15 @@ export function ProjectCardMedia({
   const [videoFailed, setVideoFailed] = useState(false);
   const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
   const [inView, setInView] = useState(false);
+  const [videoVisible, setVideoVisible] = useState(false);
   const fallbackRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const frameRef = useRef(0);
   const sizeRef = useRef({ width: 0, height: 0 });
+  const resizeLogCountRef = useRef(0);
+  const resizeEventCountRef = useRef(0);
+  const modeStateSampleRef = useRef({ startMs: 0, effectCount: 0, emitted: false });
+  const h1LogCountRef = useRef(0);
   const { shouldAutoplayMedia } = usePerformanceMode();
 
   const hasLiveVideo = Boolean(loopSrc) && !videoFailed && shouldAutoplayMedia;
@@ -78,6 +83,78 @@ export function ProjectCardMedia({
   const channelOffset = immersive ? 3 : 1.5;
   const redAlpha = immersive ? 0.4 : 0.24;
   const cyanAlpha = immersive ? 0.38 : 0.22;
+
+  useEffect(() => {
+    const sample = modeStateSampleRef.current;
+    if (!sample.startMs) {
+      sample.startMs = Date.now();
+    }
+    sample.effectCount += 1;
+
+    if (!sample.emitted && Date.now() - sample.startMs >= 2500) {
+      sample.emitted = true;
+      // #region agent log H13 media effect churn sample
+      fetch("http://127.0.0.1:7242/ingest/ff9c1328-0a4a-45f8-8ea5-81952b6584c2", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          runId: "initial",
+          hypothesisId: "H13",
+          location: "src/components/project-card-media.tsx:85",
+          message: "ProjectCardMedia mode effect churn",
+          data: {
+            sampleWindowMs: Date.now() - sample.startMs,
+            modeEffectCount: sample.effectCount,
+            hasLiveVideo,
+            inView
+          },
+          timestamp: Date.now()
+        })
+      }).catch(() => {});
+      // #endregion
+    }
+
+    if (h1LogCountRef.current < 3) {
+      h1LogCountRef.current += 1;
+      // #region agent log H1 media mode state
+      fetch("http://127.0.0.1:7242/ingest/ff9c1328-0a4a-45f8-8ea5-81952b6584c2", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          runId: "initial",
+          hypothesisId: "H1",
+          location: "src/components/project-card-media.tsx:82",
+          message: "ProjectCardMedia mode state",
+          data: {
+            hasLoopSrc: Boolean(loopSrc),
+            shouldAutoplayMedia,
+            hasLiveVideo,
+            videoFailed,
+            videoVisible,
+            inView,
+            active,
+            immersive,
+            isVideoPlaying,
+            compositorActive,
+            sampleIndex: h1LogCountRef.current
+          },
+          timestamp: Date.now()
+        })
+      }).catch(() => {});
+      // #endregion
+    }
+  }, [
+    loopSrc,
+    shouldAutoplayMedia,
+    hasLiveVideo,
+    videoFailed,
+    videoVisible,
+    inView,
+    active,
+    immersive,
+    isVideoPlaying,
+    compositorActive
+  ]);
 
   useEffect(() => {
     const target = hasLiveVideo ? videoElement : fallbackRef.current;
@@ -105,19 +182,46 @@ export function ProjectCardMedia({
   }, [hasLiveVideo, videoElement]);
 
   useEffect(() => {
+    setVideoVisible(false);
+  }, [loopSrc, hasLiveVideo]);
+
+  useEffect(() => {
+    if (!videoElement) {
+      setVideoVisible(false);
+      return;
+    }
+
+    const reveal = () => setVideoVisible(true);
+    const hide = () => setVideoVisible(false);
+
+    videoElement.addEventListener("playing", reveal);
+    videoElement.addEventListener("canplay", reveal);
+    videoElement.addEventListener("waiting", hide);
+    videoElement.addEventListener("emptied", hide);
+    videoElement.addEventListener("error", hide);
+
+    return () => {
+      videoElement.removeEventListener("playing", reveal);
+      videoElement.removeEventListener("canplay", reveal);
+      videoElement.removeEventListener("waiting", hide);
+      videoElement.removeEventListener("emptied", hide);
+      videoElement.removeEventListener("error", hide);
+    };
+  }, [videoElement]);
+
+  useEffect(() => {
     if (!hasLiveVideo) {
       sizeRef.current = { width: 0, height: 0 };
       return;
     }
 
-    let raf = 0;
-    let observer: ResizeObserver | null = null;
-    let fallbackResizeHandler: (() => void) | null = null;
+    const canvas = canvasRef.current;
+    const measurementTarget = videoElement;
+    if (!canvas || !measurementTarget) {
+      return;
+    }
 
     const applySize = (width: number, height: number) => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-
       const nextWidth = Math.max(1, Math.floor(width));
       const nextHeight = Math.max(1, Math.floor(height));
       const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
@@ -136,47 +240,48 @@ export function ProjectCardMedia({
       sizeRef.current = { width: nextWidth, height: nextHeight };
     };
 
-    const attach = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) {
-        raf = window.requestAnimationFrame(attach);
-        return;
+    const syncSize = () => {
+      const rect = measurementTarget.getBoundingClientRect();
+      resizeEventCountRef.current += 1;
+
+      if (resizeLogCountRef.current < 3) {
+        resizeLogCountRef.current += 1;
+        // #region agent log H2 size sync callback
+        fetch("http://127.0.0.1:7242/ingest/ff9c1328-0a4a-45f8-8ea5-81952b6584c2", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            runId: "initial",
+            hypothesisId: "H2",
+            location: "src/components/project-card-media.tsx:150",
+            message: "Media size sync callback",
+            data: {
+              width: rect.width,
+              height: rect.height,
+              callbackCount: resizeLogCountRef.current
+            },
+            timestamp: Date.now()
+          })
+        }).catch(() => {});
+        // #endregion
       }
 
-      const resizeObserverCtor = (window as Window & { ResizeObserver?: typeof ResizeObserver })
-        .ResizeObserver;
-
-      if (resizeObserverCtor) {
-        observer = new resizeObserverCtor((entries) => {
-          const entry = entries[0];
-          if (!entry) return;
-          applySize(entry.contentRect.width, entry.contentRect.height);
-        });
-        observer.observe(canvas);
-      } else {
-        fallbackResizeHandler = () => {
-          const nextRect = canvas.getBoundingClientRect();
-          applySize(nextRect.width, nextRect.height);
-        };
-        window.addEventListener("resize", fallbackResizeHandler, { passive: true });
-      }
-
-      const rect = canvas.getBoundingClientRect();
       applySize(rect.width, rect.height);
     };
 
-    attach();
+    const onWindowResize = () => syncSize();
+    const onViewportResize = () => syncSize();
+    window.addEventListener("resize", onWindowResize, { passive: true });
+    window.visualViewport?.addEventListener("resize", onViewportResize, { passive: true });
+    syncSize();
+    const raf = window.requestAnimationFrame(syncSize);
 
     return () => {
-      if (raf) {
-        window.cancelAnimationFrame(raf);
-      }
-      observer?.disconnect();
-      if (fallbackResizeHandler) {
-        window.removeEventListener("resize", fallbackResizeHandler);
-      }
+      window.removeEventListener("resize", onWindowResize);
+      window.visualViewport?.removeEventListener("resize", onViewportResize);
+      window.cancelAnimationFrame(raf);
     };
-  }, [hasLiveVideo]);
+  }, [hasLiveVideo, videoElement]);
 
   useEffect(() => {
     if (!compositorActive) {
@@ -277,9 +382,18 @@ export function ProjectCardMedia({
 
   return (
     <>
+      <div
+        className={`${className ?? ""} project-card-hero-fallback-layer`}
+        style={{
+          backgroundImage: posterSrc ? `url(${posterSrc}), ${gradientFallback}` : gradientFallback,
+          backgroundPosition: "center",
+          backgroundSize: "cover"
+        }}
+        aria-hidden
+      />
       <video
         ref={setVideoElement}
-        className={className}
+        className={`${className ?? ""} project-card-hero-video ${videoVisible ? "project-card-hero-video-visible" : ""}`}
         title={mediaLabel}
         aria-label={mediaLabel}
         muted

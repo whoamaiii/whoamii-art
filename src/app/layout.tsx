@@ -53,8 +53,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${manrope.variable} ${jetBrainsMono.variable}`}>
+    <html lang="en" data-motion-tier="normal" suppressHydrationWarning>
+      <body className={`${manrope.variable} ${jetBrainsMono.variable}`} suppressHydrationWarning>
         <PerformanceModeProvider>
           <PsychedelicRuntime />
           <SiteNav />

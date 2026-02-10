@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useMotionValue, useSpring } from "framer-motion";
-import { cloneElement, useEffect, useMemo, useRef, useState } from "react";
+import { cloneElement, isValidElement, useEffect, useMemo, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
 import { usePerformanceMode } from "@/hooks/use-performance-mode";
 
@@ -20,6 +20,7 @@ interface Ripple {
 const BODY_SPRING = { stiffness: 380, damping: 28, mass: 0.24 };
 const TEXT_SPRING = { stiffness: 420, damping: 30, mass: 0.19 };
 const RIPPLE_TRANSITION = { duration: 0.4, ease: [0.23, 1, 0.32, 1] } as const;
+const H7_LOG_FLAG = "__agent_h7_logged_once__";
 
 function mergeClassName(...values: Array<string | undefined>) {
   return values.filter(Boolean).join(" ");
@@ -29,6 +30,7 @@ export function MagneticButton({ children, variant = "ghost", disabled = false }
   const { motionTier } = usePerformanceMode();
   const movementScale = motionTier === "immersive" ? 0.32 : motionTier === "normal" ? 0.14 : 0;
   const interactive = !disabled && movementScale > 0;
+  const wrapperRef = useRef<HTMLSpanElement | null>(null);
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -53,7 +55,10 @@ export function MagneticButton({ children, variant = "ghost", disabled = false }
   }, []);
 
   const childElement = useMemo(() => {
-    const childClass = mergeClassName(children.props.className, "magnetic-button-target", `magnetic-button-${variant}`);
+    if (!isValidElement(children)) {
+      return null;
+    }
+    const childClass = mergeClassName(children.props.className, "magnetic-button-target", `magnetic-target-${variant}`);
     return cloneElement(children, {
       className: childClass,
       children: (
@@ -106,8 +111,48 @@ export function MagneticButton({ children, variant = "ghost", disabled = false }
     rippleTimeoutsRef.current.push(timeoutId);
   };
 
+  useEffect(() => {
+    if (variant !== "glow") {
+      return;
+    }
+    const globalWindow = window as Window & { [H7_LOG_FLAG]?: boolean };
+    if (globalWindow[H7_LOG_FLAG]) {
+      return;
+    }
+    const wrapper = wrapperRef.current;
+    if (!wrapper) {
+      return;
+    }
+    const target = wrapper.querySelector(".magnetic-button-target");
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
+    const styles = window.getComputedStyle(target);
+    // #region agent log H7 glow button style collision
+    fetch("http://127.0.0.1:7242/ingest/ff9c1328-0a4a-45f8-8ea5-81952b6584c2", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        runId: "initial",
+        hypothesisId: "H7",
+        location: "src/components/magnetic-button.tsx:112",
+        message: "Glow magnetic target computed styles",
+        data: {
+          className: target.className,
+          position: styles.position,
+          pointerEvents: styles.pointerEvents,
+          opacity: styles.opacity
+        },
+        timestamp: Date.now()
+      })
+    }).catch(() => {});
+    // #endregion
+    globalWindow[H7_LOG_FLAG] = true;
+  }, [variant]);
+
   return (
     <motion.span
+      ref={wrapperRef}
       className={mergeClassName(
         "magnetic-button-wrap",
         `magnetic-wrap-${variant}`,

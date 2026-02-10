@@ -12,6 +12,7 @@ interface StaggerContainerProps {
   tabIndex?: number;
   as?: keyof HTMLElementTagNameMap;
   kind?: "grid" | "section";
+  suppressHydrationWarning?: boolean;
 }
 
 interface StaggerItemProps {
@@ -48,7 +49,8 @@ export function StaggerContainer({
   id,
   tabIndex,
   as = "div",
-  kind = "grid"
+  kind = "grid",
+  suppressHydrationWarning = false
 }: StaggerContainerProps) {
   const { motionTier, resolved } = usePerformanceMode();
   const ref = useRef<HTMLDivElement | null>(null);
@@ -135,7 +137,7 @@ export function StaggerContainer({
   if (!shouldAnimate) {
     return (
       <StaggerKindContext.Provider value={kind}>
-        {createElement(as, { className, id, tabIndex }, children)}
+        {createElement(as, { className, id, tabIndex, suppressHydrationWarning }, children)}
       </StaggerKindContext.Provider>
     );
   }
@@ -147,11 +149,14 @@ export function StaggerContainer({
         id={as === "div" ? id : undefined}
         tabIndex={as === "div" ? tabIndex : undefined}
         className={as === "div" ? className : undefined}
+        suppressHydrationWarning={as === "div" ? suppressHydrationWarning : undefined}
         initial={false}
         animate={observerReady && !isVisible ? "hidden" : "visible"}
         variants={containerVariants}
       >
-        {as === "div" ? children : createElement(as, { className, id, tabIndex }, children)}
+        {as === "div"
+          ? children
+          : createElement(as, { className, id, tabIndex, suppressHydrationWarning }, children)}
       </motion.div>
     </StaggerKindContext.Provider>
   );

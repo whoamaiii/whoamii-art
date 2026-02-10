@@ -5,7 +5,7 @@
   --text: #f8f8fb;
   --muted: #b4b4c2;
   --line: rgba(245, 245, 255, 0.12);
-  --accent-warm: #ff6b35;
+  --accent-warm: #ff4f9f;
   --accent-cool: #00d4d4;
   --accent-purple: #9d4edd;
 
@@ -55,11 +55,19 @@ body {
 }
 
 html {
+  background-color: #050508;
+}
+
+html::before {
   background-image:
     radial-gradient(circle at 12% -20%, rgba(176, 38, 255, 0.25), transparent 42%),
     radial-gradient(circle at 88% 5%, rgba(0, 255, 240, 0.2), transparent 38%),
     linear-gradient(145deg, #050508 0%, #0a0a11 52%, #07070b 100%);
-  background-attachment: fixed;
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: fixed;
+  z-index: -1;
 }
 
 body {
@@ -360,14 +368,14 @@ li {
 .site-nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.6rem 1.2rem;
+  gap: 0.45rem 0.95rem;
   justify-content: flex-end;
   scrollbar-width: thin;
 }
 
 .nav-link {
   font-family: var(--font-jetbrains), monospace;
-  font-size: 0.74rem;
+  font-size: 0.7rem;
   letter-spacing: 0.17em;
   opacity: 0.86;
   padding-bottom: 0.25rem;
@@ -409,9 +417,8 @@ li {
 }
 
 .nav-link-active {
-  text-shadow:
-    -0.45px 0 var(--psych-pink),
-    0.45px 0 var(--psych-cyan);
+  color: color-mix(in srgb, var(--psych-cyan) 78%, var(--text) 22%);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--psych-cyan) 42%, transparent);
 }
 
 .nav-link:focus-visible {
@@ -560,16 +567,16 @@ li {
 .glow-button {
   background:
     linear-gradient(rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0)) padding-box,
-    linear-gradient(110deg, var(--psych-gold), var(--psych-pink), var(--accent-warm)) border-box;
+    linear-gradient(110deg, var(--psych-gold), var(--psych-pink), var(--psych-violet)) border-box;
   border: 1px solid transparent;
-  box-shadow: 0 8px 30px rgba(255, 107, 53, 0.3);
+  box-shadow: 0 8px 30px rgba(176, 38, 255, 0.28);
   color: #090909;
   font-weight: 750;
   transition: transform 0.24s ease, box-shadow 0.26s ease;
 }
 
 .glow-button:hover {
-  box-shadow: 0 0 30px rgba(255, 107, 53, 0.42);
+  box-shadow: 0 0 30px rgba(176, 38, 255, 0.4);
   transform: translateY(-1px);
 }
 
@@ -836,6 +843,24 @@ li {
 .project-card-media-shell {
   overflow: hidden;
   position: relative;
+}
+
+.project-card-hero-fallback-layer {
+  position: relative;
+  z-index: 0;
+}
+
+.project-card-hero-video {
+  inset: 0;
+  object-fit: cover;
+  opacity: 0;
+  position: absolute;
+  transition: opacity 240ms ease;
+  z-index: 1;
+}
+
+.project-card-hero-video-visible {
+  opacity: 1;
 }
 
 .project-card-aberration-canvas {
@@ -1479,6 +1504,51 @@ html[data-motion-tier="normal"] .project-card-tilt {
   transform: none;
 }
 
+/* ── normal-tier GPU cost reductions ────────────────────────── */
+
+/* H15: replace expensive backdrop-filter with cheaper solid bg */
+html[data-motion-tier="normal"] .project-card,
+html[data-motion-tier="lite"] .project-card {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(9, 10, 17, 0.88) !important;
+}
+
+html[data-motion-tier="normal"] .project-card:hover,
+html[data-motion-tier="lite"] .project-card:hover {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(12, 13, 22, 0.92) !important;
+}
+
+/* H16: disable continuous infinite CSS animations */
+html[data-motion-tier="normal"] .psychedelic-bg-normal,
+html[data-motion-tier="lite"] .psychedelic-bg-normal {
+  animation: none;
+}
+
+html[data-motion-tier="normal"] .site-logo-letter,
+html[data-motion-tier="lite"] .site-logo-letter {
+  animation: none;
+}
+
+html[data-motion-tier="normal"] .project-card::before,
+html[data-motion-tier="lite"] .project-card::before {
+  animation: none;
+}
+
+html[data-motion-tier="normal"] .nav-link-active::after,
+html[data-motion-tier="lite"] .nav-link-active::after {
+  animation: none;
+}
+
+/* H15+H16: keep header blur but lower radius */
+html[data-motion-tier="normal"] .site-header,
+html[data-motion-tier="lite"] .site-header {
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
 @media (hover: none), (pointer: coarse) {
   .panel:hover,
   .category-card:hover,
@@ -1538,7 +1608,7 @@ html[data-motion-tier="normal"] .project-card {
   --aberration-scale: 1.03;
 }
 
-@media (max-width: 860px) {
+@media (max-width: 1120px) {
   .project-card {
     --aberration-offset: 2px;
     --aberration-red-opacity: 0.28;
@@ -1564,16 +1634,15 @@ html[data-motion-tier="normal"] .project-card {
   .site-header {
     align-items: flex-start;
     flex-direction: column;
-    gap: 0.6rem;
+    gap: 0.45rem;
   }
 
   .site-nav {
-    -webkit-overflow-scrolling: touch;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     justify-content: flex-start;
     max-width: 100%;
-    overflow-x: auto;
-    padding-bottom: 0.2rem;
+    overflow: visible;
+    padding-bottom: 0;
     width: 100%;
   }
 

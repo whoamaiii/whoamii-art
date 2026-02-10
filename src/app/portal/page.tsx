@@ -13,7 +13,14 @@ export default function PortalPage() {
   const topTools = new Set(featuredProjects.flatMap((project) => project.toolStack)).size;
 
   return (
-    <StaggerContainer as="main" id="main-content" tabIndex={-1} className="home-shell top-spaced" kind="section">
+    <StaggerContainer
+      as="main"
+      id="main-content"
+      tabIndex={-1}
+      className="home-shell top-spaced"
+      kind="section"
+      suppressHydrationWarning
+    >
       <StaggerItem>
         <section className="hero-zone">
           <p className="hero-kicker">{identitySystem.portalName}</p>

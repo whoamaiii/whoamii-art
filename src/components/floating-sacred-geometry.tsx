@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
+import { useEffect } from "react";
 import type { MotionTier } from "@/components/psychedelic-background";
 
 interface FloatingSacredGeometryProps {
@@ -78,12 +79,34 @@ function renderMotif(shape: Motif["shape"]) {
 export function FloatingSacredGeometry({ motionTier }: FloatingSacredGeometryProps) {
   const { scrollY } = useScroll();
   const parallax = useTransform(scrollY, [0, 1800], [0, motionTier === "immersive" ? -70 : -20]);
+  const activeCount = motionTier === "immersive" ? motifs.length : 3;
+
+  useEffect(() => {
+    // #region agent log H11 sacred geometry runtime load
+    fetch("http://127.0.0.1:7242/ingest/ff9c1328-0a4a-45f8-8ea5-81952b6584c2", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        runId: "initial",
+        hypothesisId: "H11",
+        location: "src/components/floating-sacred-geometry.tsx:82",
+        message: "Sacred geometry activation profile",
+        data: {
+          motionTier,
+          activeCount,
+          immersiveAnimations: motionTier === "immersive"
+        },
+        timestamp: Date.now()
+      })
+    }).catch(() => {});
+    // #endregion
+  }, [activeCount, motionTier]);
 
   if (motionTier === "lite") {
     return null;
   }
 
-  const active = motionTier === "immersive" ? motifs : motifs.slice(0, 5);
+  const active = motionTier === "immersive" ? motifs : motifs.slice(0, activeCount);
 
   return (
     <div className="sacred-layer" aria-hidden>
