@@ -21,13 +21,6 @@ function rateHeaders(rate: { retryAfterSeconds: number; remaining: number }) {
 }
 
 export async function POST(request: Request) {
-  if (!isJsonRequest(request)) {
-    return NextResponse.json(
-      { ok: false, errors: ["Content-Type must be application/json."] },
-      { status: 415 }
-    );
-  }
-
   const identity = getRateLimitIdentity(request);
   const rate = await consumeRateLimit(`commissions:${identity}`, {
     limit: RATE_LIMIT_MAX,
@@ -44,6 +37,13 @@ export async function POST(request: Request) {
           "Retry-After": String(rate.retryAfterSeconds)
         }
       }
+    );
+  }
+
+  if (!isJsonRequest(request)) {
+    return NextResponse.json(
+      { ok: false, errors: ["Content-Type must be application/json."] },
+      { status: 415, headers }
     );
   }
 

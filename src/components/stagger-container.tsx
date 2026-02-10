@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
 import { createContext, createElement, useContext, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { usePerformanceMode } from "@/hooks/use-performance-mode";
@@ -29,10 +29,12 @@ export function StaggerContainer({
   as = "div",
   kind = "grid"
 }: StaggerContainerProps) {
-  const { motionTier } = usePerformanceMode();
+  const { motionTier, resolved } = usePerformanceMode();
   const ref = useRef<HTMLDivElement | null>(null);
-  const inView = useInView(ref, { once: true, margin: "-10% 0px" });
-  const [observerFallbackVisible, setObserverFallbackVisible] = useState(false);
+  const hasEnteredViewRef = useRef(false);
+  const [observerReady, setObserverReady] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const shouldAnimate = resolved && motionTier !== "lite";
 
   const containerVariants = useMemo(
     () => ({
@@ -49,22 +51,67 @@ export function StaggerContainer({
   );
 
   useEffect(() => {
-    if (motionTier === "lite" || inView) {
-      setObserverFallbackVisible(true);
+    if (!shouldAnimate) {
+      hasEnteredViewRef.current = false;
+      setObserverReady(false);
+      setIsVisible(true);
       return;
     }
 
-    // Failsafe: if IntersectionObserver never fires, reveal content anyway.
-    const timer = window.setTimeout(() => {
-      setObserverFallbackVisible(true);
+    const target = ref.current;
+    if (!target) {
+      setObserverReady(true);
+      setIsVisible(true);
+      return;
+    }
+
+    const intersectionObserverCtor = (
+      window as Window & { IntersectionObserver?: typeof IntersectionObserver }
+    ).IntersectionObserver;
+
+    if (!intersectionObserverCtor) {
+      setObserverReady(true);
+      setIsVisible(true);
+      return;
+    }
+
+    let fallbackTimer = window.setTimeout(() => {
+      setObserverReady(true);
+      setIsVisible(true);
     }, 650);
 
-    return () => {
-      window.clearTimeout(timer);
-    };
-  }, [inView, motionTier]);
+    const observer = new intersectionObserverCtor(
+      (entries) => {
+        const [entry] = entries;
+        if (!entry) return;
 
-  if (motionTier === "lite") {
+        if (entry.isIntersecting) {
+          hasEnteredViewRef.current = true;
+          observer.unobserve(entry.target);
+        }
+
+        setObserverReady(true);
+        setIsVisible(entry.isIntersecting || hasEnteredViewRef.current);
+
+        if (fallbackTimer) {
+          window.clearTimeout(fallbackTimer);
+          fallbackTimer = 0;
+        }
+      },
+      { rootMargin: "-10% 0px", threshold: 0.01 }
+    );
+
+    observer.observe(target);
+
+    return () => {
+      observer.disconnect();
+      if (fallbackTimer) {
+        window.clearTimeout(fallbackTimer);
+      }
+    };
+  }, [shouldAnimate]);
+
+  if (!shouldAnimate) {
     return (
       <StaggerKindContext.Provider value={kind}>
         {createElement(as, { className, id, tabIndex }, children)}
@@ -79,8 +126,8 @@ export function StaggerContainer({
         id={as === "div" ? id : undefined}
         tabIndex={as === "div" ? tabIndex : undefined}
         className={as === "div" ? className : undefined}
-        initial="hidden"
-        animate={inView || observerFallbackVisible ? "visible" : "hidden"}
+        initial={false}
+        animate={observerReady && !isVisible ? "hidden" : "visible"}
         variants={containerVariants}
       >
         {as === "div" ? children : createElement(as, { className, id, tabIndex }, children)}

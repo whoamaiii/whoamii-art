@@ -97,9 +97,10 @@ export function ProjectCard({ project, onSelect, selected = false }: ProjectCard
       >
         <button
           type="button"
-          className="project-card-select"
+          className="project-card-select hover-control"
           onClick={() => onSelect(project.slug)}
           aria-pressed={selected}
+          data-cursor-hit
         >
           {cardBody}
         </button>

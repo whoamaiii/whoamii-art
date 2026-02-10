@@ -13,7 +13,12 @@ export function ProcessLayerToggle({ layers }: ProcessLayerToggleProps) {
   return (
     <section className="process-layer">
       <MagneticButton variant="glow">
-        <button className="glow-button" type="button" onClick={() => setRevealed((value) => !value)}>
+        <button
+          className="glow-button hover-control"
+          type="button"
+          onClick={() => setRevealed((value) => !value)}
+          data-cursor-hit
+        >
           {revealed ? "Hide Process Layer" : "Reveal Process Layer"}
         </button>
       </MagneticButton>

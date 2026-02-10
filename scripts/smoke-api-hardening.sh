@@ -6,6 +6,8 @@ BASE_URL="${BASE_URL:-http://localhost:${PORT}}"
 RATE_LIMIT_MAX="${SUBMISSION_RATE_LIMIT_MAX:-8}"
 AUTO_START_DEV="${SMOKE_AUTO_START_DEV:-1}"
 TMP_DIR="${TMPDIR:-/tmp}/portfolio-smoke-api-$$"
+NEXT_BIN="./node_modules/.bin/next"
+SCRIPT_PGID="$(ps -o pgid= -p $$ | tr -d '[:space:]')"
 
 mkdir -p "${TMP_DIR}"
 
@@ -15,7 +17,16 @@ DEV_PID=""
 
 cleanup() {
   if [[ -n "${DEV_PID}" ]] && kill -0 "${DEV_PID}" 2>/dev/null; then
-    kill "${DEV_PID}" >/dev/null 2>&1 || true
+    local dev_pgid=""
+    dev_pgid="$(ps -o pgid= -p "${DEV_PID}" 2>/dev/null | tr -d '[:space:]')"
+
+    if [[ -n "${dev_pgid}" ]] && [[ "${dev_pgid}" != "${SCRIPT_PGID}" ]]; then
+      kill -TERM -- "-${dev_pgid}" >/dev/null 2>&1 || true
+      sleep 1
+      kill -KILL -- "-${dev_pgid}" >/dev/null 2>&1 || true
+    else
+      kill "${DEV_PID}" >/dev/null 2>&1 || true
+    fi
     wait "${DEV_PID}" 2>/dev/null || true
   fi
   rm -rf "${TMP_DIR}"
@@ -91,8 +102,17 @@ ensure_server() {
     return
   fi
 
+  if [[ ! -x "${NEXT_BIN}" ]]; then
+    fail "Cannot find executable ${NEXT_BIN}"
+    return
+  fi
+
   printf 'Starting dev server on %s...\n' "${BASE_URL}"
-  npm run dev -- --port "${PORT}" >"${TMP_DIR}/dev.log" 2>&1 &
+  if command -v setsid >/dev/null 2>&1; then
+    setsid "${NEXT_BIN}" dev --port "${PORT}" >"${TMP_DIR}/dev.log" 2>&1 &
+  else
+    "${NEXT_BIN}" dev --port "${PORT}" >"${TMP_DIR}/dev.log" 2>&1 &
+  fi
   DEV_PID=$!
 
   for _ in $(seq 1 60); do

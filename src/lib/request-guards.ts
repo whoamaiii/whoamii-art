@@ -41,6 +41,14 @@ function normalizeIdentityPart(value: string | null, fallback: string) {
   return normalized || fallback;
 }
 
+function normalizeOptionalIdentityPart(value: string | null | undefined) {
+  return (value ?? "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 120);
+}
+
 function hashIdentity(value: string) {
   let hash = 2166136261;
   for (let index = 0; index < value.length; index += 1) {
@@ -49,6 +57,8 @@ function hashIdentity(value: string) {
   }
   return (hash >>> 0).toString(36);
 }
+
+let loggedMissingIdentitySalt = false;
 
 export function getRateLimitIdentity(request: Request) {
   const ip = getClientIp(request);
@@ -59,7 +69,16 @@ export function getRateLimitIdentity(request: Request) {
   const userAgent = normalizeIdentityPart(request.headers.get("user-agent"), "ua");
   const language = normalizeIdentityPart(request.headers.get("accept-language"), "lang");
   const host = normalizeIdentityPart(request.headers.get("host"), "host");
-  const fingerprintSeed = `${userAgent}|${language}|${host}`;
+  const identitySalt = normalizeOptionalIdentityPart(process.env.RATE_LIMIT_IDENTITY_SALT);
+  if (process.env.NODE_ENV === "production" && !identitySalt && !loggedMissingIdentitySalt) {
+    console.warn(
+      "RATE_LIMIT_IDENTITY_SALT is not set in production; fallback rate-limit identity is easier to spoof."
+    );
+    loggedMissingIdentitySalt = true;
+  }
+  const fingerprintSeed = identitySalt
+    ? `${userAgent}|${language}|${host}|${identitySalt}`
+    : `${userAgent}|${language}|${host}`;
   const fingerprint = hashIdentity(fingerprintSeed);
   const sizeTag = fingerprintSeed.length.toString(36);
   return `fp:${fingerprint}:${sizeTag}`;

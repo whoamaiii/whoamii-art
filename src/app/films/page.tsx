@@ -10,11 +10,25 @@ import { projects } from "@/content/projects";
 import { projectTaxonomyBySlug } from "@/content/project-taxonomy";
 
 export default function FilmsPage() {
-  const [year, setYear] = useState<"Recent" | "2025" | "2024">("Recent");
-  const [mood, setMood] = useState<"All" | "Meditative" | "Energetic" | "Surreal">("All");
-  const [subject, setSubject] = useState<"All" | "Faces" | "Hands" | "Landscape" | "Animals" | "Objects">(
-    "All"
-  );
+  type YearOption = "Recent" | "2025" | "2024";
+  type MoodOption = "All" | "Meditative" | "Energetic" | "Surreal";
+  type SubjectOption = "All" | "Faces" | "Hands" | "Landscape" | "Animals" | "Objects";
+
+  const [year, setYear] = useState<YearOption>("Recent");
+  const [mood, setMood] = useState<MoodOption>("All");
+  const [subject, setSubject] = useState<SubjectOption>("All");
+
+  const isYearOption = (value: string): value is YearOption =>
+    value === "Recent" || value === "2025" || value === "2024";
+  const isMoodOption = (value: string): value is MoodOption =>
+    value === "All" || value === "Meditative" || value === "Energetic" || value === "Surreal";
+  const isSubjectOption = (value: string): value is SubjectOption =>
+    value === "All" ||
+    value === "Faces" ||
+    value === "Hands" ||
+    value === "Landscape" ||
+    value === "Animals" ||
+    value === "Objects";
 
   const reelProjects = projects.filter((project) => Boolean(project.media.loopSrc));
   const filteredProjects = useMemo(() => {
@@ -47,7 +61,16 @@ export default function FilmsPage() {
           <div className="filter-wrap">
             <label>
               Chronology
-              <select value={year} onChange={(event) => setYear(event.target.value as typeof year)} data-cursor-hit>
+              <select
+                value={year}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  if (isYearOption(value)) {
+                    setYear(value);
+                  }
+                }}
+                data-cursor-hit
+              >
                 <option value="Recent">Recent</option>
                 <option value="2025">2025</option>
                 <option value="2024">2024</option>
@@ -55,7 +78,16 @@ export default function FilmsPage() {
             </label>
             <label>
               Mood
-              <select value={mood} onChange={(event) => setMood(event.target.value as typeof mood)} data-cursor-hit>
+              <select
+                value={mood}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  if (isMoodOption(value)) {
+                    setMood(value);
+                  }
+                }}
+                data-cursor-hit
+              >
                 <option value="All">All moods</option>
                 <option value="Meditative">Meditative</option>
                 <option value="Energetic">Energetic</option>
@@ -64,7 +96,16 @@ export default function FilmsPage() {
             </label>
             <label>
               Subject
-              <select value={subject} onChange={(event) => setSubject(event.target.value as typeof subject)} data-cursor-hit>
+              <select
+                value={subject}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  if (isSubjectOption(value)) {
+                    setSubject(value);
+                  }
+                }}
+                data-cursor-hit
+              >
                 <option value="All">All subjects</option>
                 <option value="Faces">Faces</option>
                 <option value="Hands">Hands</option>
@@ -81,7 +122,7 @@ export default function FilmsPage() {
               return (
                 <StaggerItem key={project.slug}>
                   <article className="film-card">
-                    <Link href={`/work/${project.slug}`} data-cursor-hit>
+                    <Link href={`/work/${project.slug}`} className="film-card-link hover-media-link" data-cursor-hit>
                       <ProjectMedia
                         className="film-frame"
                         loopSrc={project.media.loopSrc}
