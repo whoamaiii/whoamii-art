@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useInView } from "framer-motion";
-import { createContext, createElement, useContext, useMemo, useRef } from "react";
+import { createContext, createElement, useContext, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { usePerformanceMode } from "@/hooks/use-performance-mode";
 
@@ -32,6 +32,7 @@ export function StaggerContainer({
   const { motionTier } = usePerformanceMode();
   const ref = useRef<HTMLDivElement | null>(null);
   const inView = useInView(ref, { once: true, margin: "-10% 0px" });
+  const [observerFallbackVisible, setObserverFallbackVisible] = useState(false);
 
   const containerVariants = useMemo(
     () => ({
@@ -46,6 +47,22 @@ export function StaggerContainer({
     }),
     [kind]
   );
+
+  useEffect(() => {
+    if (motionTier === "lite" || inView) {
+      setObserverFallbackVisible(true);
+      return;
+    }
+
+    // Failsafe: if IntersectionObserver never fires, reveal content anyway.
+    const timer = window.setTimeout(() => {
+      setObserverFallbackVisible(true);
+    }, 650);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [inView, motionTier]);
 
   if (motionTier === "lite") {
     return (
@@ -63,7 +80,7 @@ export function StaggerContainer({
         tabIndex={as === "div" ? tabIndex : undefined}
         className={as === "div" ? className : undefined}
         initial="hidden"
-        animate={inView ? "visible" : "hidden"}
+        animate={inView || observerFallbackVisible ? "visible" : "hidden"}
         variants={containerVariants}
       >
         {as === "div" ? children : createElement(as, { className, id, tabIndex }, children)}
