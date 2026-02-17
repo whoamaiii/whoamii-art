@@ -1,40 +1,54 @@
-import type { Metadata } from "next";
-import { StaggerContainer, StaggerItem } from "@/components/stagger-container";
-import { TextReveal } from "@/components/text-reveal";
+import Link from "next/link";
+import { getSiteSettings } from "@/lib/sanity/queries";
 
-export const metadata: Metadata = {
-  title: "About | WHOAMIII",
-  description: "Artist statement, style genome, and workflow philosophy of WHOAMIII."
-};
+export const revalidate = 300;
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const settings = await getSiteSettings();
+
   return (
-    <StaggerContainer as="main" id="main-content" tabIndex={-1} className="top-spaced page-shell" kind="section">
-      <StaggerItem>
-        <section className="panel">
-          <TextReveal text="About" as="h1" />
+    <main id="main-content" className="page-shell">
+      <div className="container page-stack">
+        <section className="section-frame content-column">
+          <p className="section-kicker">About</p>
+          <h1>{settings.aboutHeading || "WHOAMIII"}</h1>
+          <p>{settings.aboutBody}</p>
           <p>
-            WHOAMIII is a motion artist working with psychedelic replication, sacred geometry, and
-            bio-digital composites.
-          </p>
-          <p>
-            The work starts from drawings, people, and real-world capture, then passes through Blender and
-            After Effects to reveal hidden dimensions in everyday subjects.
+            I design visual systems where intensity is intentional. Every frame balances expressive
+            experimentation with repeatable structure so the work holds up both artistically and commercially.
           </p>
         </section>
-      </StaggerItem>
 
-      <StaggerItem>
-        <section className="panel">
-          <h2>Style Genome</h2>
-          <ul>
-            <li>Bio-digital symbiosis between human form and geometric overlays.</li>
-            <li>Hyper-saturation used as emotional truth, not decoration.</li>
-            <li>Motion as revelation: unfold, burst, pulse, then loop.</li>
-            <li>Handmade + machine fusion with human intent driving the pipeline.</li>
-          </ul>
+        <section className="section-frame split-grid">
+          <article className="hero-intro">
+            <p className="section-kicker">Core Principles</p>
+            <h2>How projects are built</h2>
+            <ul className="bullet-list">
+              <li>Composition before effects.</li>
+              <li>Narrative clarity through process documentation.</li>
+              <li>Material contrast: analog references plus digital precision.</li>
+              <li>Delivery specs aligned to campaign and platform goals.</li>
+            </ul>
+          </article>
+
+          <aside className="hero-note">
+            <h3>Selected practice areas</h3>
+            <ul>
+              <li>Motion direction for artists and releases</li>
+              <li>Campaign visuals and social-first loop systems</li>
+              <li>Immersive installation-ready motion assets</li>
+            </ul>
+            <div className="hero-actions">
+              <Link href="/work" className="button-secondary">
+                Explore Work
+              </Link>
+              <Link href="/contact" className="button-primary">
+                Discuss a Project
+              </Link>
+            </div>
+          </aside>
         </section>
-      </StaggerItem>
-    </StaggerContainer>
+      </div>
+    </main>
   );
 }

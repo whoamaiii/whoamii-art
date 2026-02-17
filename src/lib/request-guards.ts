@@ -5,29 +5,39 @@ interface ParsedJsonResult {
   data?: unknown;
 }
 
+const MAX_IDENTITY_IP_LENGTH = 64;
+
 export function isJsonRequest(request: Request) {
   const contentType = request.headers.get("content-type");
-  return Boolean(contentType && contentType.toLowerCase().includes("application/json"));
+  if (!contentType) return false;
+  const mime = contentType.toLowerCase().split(";")[0]?.trim();
+  return mime === "application/json";
+}
+
+function normalizeIpCandidate(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const normalized = value.trim().slice(0, MAX_IDENTITY_IP_LENGTH);
+  if (!normalized) return null;
+  if (!/^[0-9a-fA-F:.\-]+$/.test(normalized)) return null;
+  return normalized;
 }
 
 function getFirstForwardedIp(request: Request): string | null {
   const forwarded = request.headers.get("x-forwarded-for");
-  if (forwarded) {
-    const first = forwarded.split(",")[0]?.trim();
-    if (first) return first;
-  }
-  return null;
+  if (!forwarded) return null;
+  const first = forwarded.split(",")[0];
+  return normalizeIpCandidate(first);
 }
 
 export function getClientIp(request: Request): string | null {
-  const forwarded = getFirstForwardedIp(request);
-  if (forwarded) return forwarded;
+  const cfIp = normalizeIpCandidate(request.headers.get("cf-connecting-ip"));
+  if (cfIp) return cfIp;
 
-  const realIp = request.headers.get("x-real-ip")?.trim();
+  const realIp = normalizeIpCandidate(request.headers.get("x-real-ip"));
   if (realIp) return realIp;
 
-  const cfIp = request.headers.get("cf-connecting-ip")?.trim();
-  if (cfIp) return cfIp;
+  const forwarded = getFirstForwardedIp(request);
+  if (forwarded) return forwarded;
 
   return null;
 }
@@ -108,7 +118,6 @@ export async function parseJsonBody(request: Request, maxBytes: number): Promise
 
   const reader = stream.getReader();
   const decoder = new TextDecoder();
-  const chunks: string[] = [];
   let bytesRead = 0;
   let raw = "";
 
@@ -132,11 +141,10 @@ export async function parseJsonBody(request: Request, maxBytes: number): Promise
         };
       }
 
-      chunks.push(decoder.decode(value, { stream: true }));
+      raw += decoder.decode(value, { stream: true });
     }
 
-    chunks.push(decoder.decode());
-    raw = chunks.join("");
+    raw += decoder.decode();
   } catch {
     return {
       ok: false,

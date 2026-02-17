@@ -1,11 +1,14 @@
 import { ImageResponse } from "next/og";
 
-export const runtime = "nodejs";
-export const contentType = "image/png";
+export const runtime = "edge";
+
+export const alt = "WHOAMIII Portfolio";
 export const size = {
   width: 1200,
   height: 630
 };
+
+export const contentType = "image/png";
 
 export default function OpenGraphImage() {
   return new ImageResponse(
@@ -16,40 +19,37 @@ export default function OpenGraphImage() {
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
+          justifyContent: "space-between",
+          padding: "56px 72px",
           background:
-            "radial-gradient(circle at 15% 20%, #9D4EDD 0%, #0A0A0A 48%, #00D4D4 100%)",
-          color: "#F5F5F5",
-          padding: "72px"
+            "radial-gradient(circle at 14% 15%, rgba(226,77,47,0.45), transparent 50%), radial-gradient(circle at 84% 78%, rgba(46,107,104,0.5), transparent 45%), #12100f",
+          color: "#f3ece2"
         }}
       >
         <p
           style={{
-            fontSize: 28,
-            letterSpacing: 6,
-            margin: 0,
-            opacity: 0.88
+            fontSize: 24,
+            textTransform: "uppercase",
+            letterSpacing: "0.15em",
+            opacity: 0.85
           }}
         >
           WHOAMIII
         </p>
+
         <h1
           style={{
-            margin: "14px 0 0",
-            fontSize: 78,
-            lineHeight: 1.02
+            margin: 0,
+            fontSize: 82,
+            lineHeight: 1.03,
+            width: "90%"
           }}
         >
-          Motion Portfolio
+          Structured Maximalist Portfolio
         </h1>
-        <p
-          style={{
-            margin: "18px 0 0",
-            fontSize: 33,
-            opacity: 0.9
-          }}
-        >
-          Psychedelic replication and cinematic visual loops.
+
+        <p style={{ margin: 0, fontSize: 30, opacity: 0.9 }}>
+          Commissions · Artwork · Process Stories
         </p>
       </div>
     ),

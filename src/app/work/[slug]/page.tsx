@@ -1,161 +1,143 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BeforeAfterReveal } from "@/components/before-after-reveal";
-import { MagneticButton } from "@/components/magnetic-button";
-import { ProjectMedia } from "@/components/project-media";
-import { ProcessLayerToggle } from "@/components/process-layer-toggle";
-import { StaggerContainer, StaggerItem } from "@/components/stagger-container";
-import { TextReveal } from "@/components/text-reveal";
-import { projects } from "@/content/projects";
-import { projectTaxonomyBySlug } from "@/content/project-taxonomy";
-import { contactMailHref, siteConfig } from "@/content/site";
+import { ProcessBlockRenderer } from "@/components/process-block-renderer";
+import { optimizeCloudinaryVideo } from "@/lib/cloudinary";
+import { urlForImage } from "@/lib/sanity/image";
+import { getProjectBySlug, getProjectSlugs } from "@/lib/sanity/queries";
 
-interface WorkPageProps {
+interface WorkDetailPageProps {
   params: Promise<{ slug: string }>;
 }
 
-export const dynamicParams = false;
+export const revalidate = 300;
 
-export function generateStaticParams() {
-  return projects.map((project) => ({ slug: project.slug }));
+export async function generateStaticParams() {
+  const slugs = await getProjectSlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
-export async function generateMetadata({ params }: WorkPageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: WorkDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const project = projects.find((entry) => entry.slug === slug);
+  const project = await getProjectBySlug(slug);
 
   if (!project) {
     return {
-      title: "Work Not Found | WHOAMIII"
+      title: "Work Not Found"
     };
   }
 
   return {
-    title: `${project.title} | WHOAMIII`,
-    description: project.oneLiner
+    title: project.seoTitle || project.title,
+    description: project.seoDescription || project.summary
   };
 }
 
-export default async function WorkDetailPage({ params }: WorkPageProps) {
+export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
   const { slug } = await params;
-  const project = projects.find((entry) => entry.slug === slug);
+  const project = await getProjectBySlug(slug);
 
   if (!project) {
     notFound();
   }
-  const tags = projectTaxonomyBySlug[project.slug];
+
+  const heroImageUrl = urlForImage(project.coverImage)
+    ?.width(1920)
+    .height(1080)
+    .fit("crop")
+    .auto("format")
+    .url();
+
+  const heroVideoUrl = project.coverVideo ? optimizeCloudinaryVideo(project.coverVideo) : undefined;
 
   return (
-    <StaggerContainer
-      as="main"
-      id="main-content"
-      tabIndex={-1}
-      className="work-page top-spaced"
-      kind="section"
-    >
-      <StaggerItem>
-        <div className="work-hero">
-          <ProjectMedia
-            className="work-hero-media"
-            gradientFallback={project.heroGradient}
-            loopSrc={project.media.loopSrc}
-            posterSrc={project.media.posterSrc}
-            mediaLabel={`${project.title} hero media`}
-          />
-          <div className="work-hero-overlay">
-            <p className="project-kicker">{project.category} - {project.year} - {project.duration}</p>
-            <TextReveal text={project.title} as="h1" />
-            <p>{project.oneLiner}</p>
-            <div className="chip-row">
-              {project.toolStack.map((tool) => (
-                <span key={`${project.slug}-${tool}`} className="chip">
-                  {tool}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </StaggerItem>
-
-      <StaggerItem>
-        <section className="work-content">
-          <article>
-            <h2>Artist Note</h2>
-            <p>
-              This piece is part of the {project.category} stream, where source textures and symbolic
-              forms are transformed into cinematic loops with an emotional center.
+    <main id="main-content" className="page-shell">
+      <div className="container page-stack">
+        <article className="section-frame case-study">
+          <header className="case-study-header">
+            <p className="mono-meta">
+              {project.year}
+              {project.duration ? ` · ${project.duration}` : ""}
             </p>
-          </article>
-
-          <article>
-            <h2>Vibe Tags</h2>
-            <div className="chip-row">
-              {project.vibe.map((tag) => (
-                <span key={`${project.slug}-${tag}`} className="chip">
-                  {tag}
-                </span>
+            <h1>{project.title}</h1>
+            <p className="case-study-summary">{project.summary}</p>
+            <ul className="chip-row">
+              {project.categories.map((category) => (
+                <li key={`${project.slug}-${category}`}>{category}</li>
               ))}
-            </div>
-          </article>
+              {project.tools.map((tool) => (
+                <li key={`${project.slug}-${tool}`}>{tool}</li>
+              ))}
+            </ul>
+          </header>
 
-          <article>
-            <h2>Classification</h2>
-            <div className="chip-row">
-              <span className="chip">{tags?.technique ?? "Hybrid"}</span>
-              <span className="chip">{tags?.subject ?? "Subject Study"}</span>
-              <span className="chip">{tags?.intensity ?? "Moderate"}</span>
-              <span className="chip">{tags?.color ?? "Multi"}</span>
-              <span className="chip">{tags?.mood ?? "Surreal"}</span>
-            </div>
-          </article>
-
-          <BeforeAfterReveal
-            afterSrc={project.media.posterSrc}
-            fallbackGradient={project.heroGradient}
-            label={project.title}
-          />
-
-          <ProcessLayerToggle layers={project.processLayers} />
-
-          <div className="work-actions">
-            <MagneticButton variant="ghost">
-              <Link href="/replications" className="ghost-button" data-cursor-hit>
-                Back To Replications
-              </Link>
-            </MagneticButton>
-            <MagneticButton variant="ghost">
-              <Link href="/films" className="ghost-button" data-cursor-hit>
-                Continue To Films
-              </Link>
-            </MagneticButton>
-            <MagneticButton variant="ghost">
-              <Link href="/commissions" className="ghost-button" data-cursor-hit>
-                Commission A Vision
-              </Link>
-            </MagneticButton>
-            {contactMailHref ? (
-              <MagneticButton variant="glow">
-                <a className="glow-button" href={contactMailHref} data-cursor-hit>
-                  Inquire For Collection
-                </a>
-              </MagneticButton>
+          <div className="case-media-shell">
+            {heroVideoUrl ? (
+              <video controls muted loop playsInline preload="metadata" poster={heroImageUrl}>
+                <source src={heroVideoUrl} type="video/mp4" />
+              </video>
+            ) : heroImageUrl ? (
+              <Image
+                src={heroImageUrl}
+                alt={project.coverImage?.alt || `${project.title} hero media`}
+                width={1920}
+                height={1080}
+                sizes="(max-width: 1024px) 100vw, 82vw"
+              />
             ) : (
-              <MagneticButton variant="glow">
-                <a
-                  className="glow-button"
-                  href={siteConfig.instagramUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-cursor-hit
-                >
-                  Inquire Via Instagram
-                </a>
-              </MagneticButton>
+              <div className="preview-frame preview-frame-landscape" aria-hidden>
+                <div className="preview-fallback" />
+              </div>
             )}
           </div>
-        </section>
-      </StaggerItem>
-    </StaggerContainer>
+
+          <section className="case-meta-grid" aria-label="Case study narrative">
+            <article>
+              <p className="mono-meta">Challenge</p>
+              <p>{project.challenge || "Challenge details will be published soon."}</p>
+            </article>
+            <article>
+              <p className="mono-meta">Solution</p>
+              <p>{project.solution || "Solution details will be published soon."}</p>
+            </article>
+            <article>
+              <p className="mono-meta">Outcome</p>
+              <p>{project.outcome || "Outcome details will be published soon."}</p>
+            </article>
+          </section>
+
+          <ProcessBlockRenderer blocks={project.processBlocks || []} />
+
+          {project.credits.length ? (
+            <section className="section-frame">
+              <h2>Credits</h2>
+              <ul className="credit-list">
+                {project.credits.map((credit) => (
+                  <li key={credit._key || `${credit.name}-${credit.role}`}>
+                    <strong>{credit.name}</strong>
+                    <p>{credit.role}</p>
+                    {credit.link ? (
+                      <a href={credit.link} target="_blank" rel="noopener noreferrer">
+                        {credit.link}
+                      </a>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+
+          <div className="hero-actions">
+            <Link href="/work" className="button-secondary">
+              Back to Work
+            </Link>
+            <Link href="/contact" className="button-primary">
+              Start a Similar Commission
+            </Link>
+          </div>
+        </article>
+      </div>
+    </main>
   );
 }

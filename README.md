@@ -1,68 +1,82 @@
-# Quentin Qmann Portfolio
+# WHOAMIII Portfolio
 
-High-intensity portfolio site for Quentin Qmann's psychedelic visual practice.
+Art-first, commission-focused portfolio built with Next.js, TypeScript, Sanity, and Cloudinary.
 
 ## Stack
+- Next.js App Router
+- Sanity CMS (`project`, `projectCategory`, `siteSettings`)
+- Cloudinary-hosted video delivery
+- Resend-powered inquiry email API
 
-- Next.js (App Router) + TypeScript
-- Framer Motion for interaction choreography
-- Structured content model in `src/content/*`
-- Ready for WebGL/R3F extensions if deeper shader scenes are added
+## Local Setup
 
-## Implemented Plan Areas
-
-- Signature identity system (`src/content/identity.ts`)
-- Curated taxonomy and hero archive (`src/content/projects.ts`)
-- Immersive homepage with route exits (`src/app/page.tsx`)
-- Cinematic project template with process reveal (`src/app/work/[slug]/page.tsx`)
-- Performance-aware rendering based on reduced-motion and low-power detection (`src/hooks/use-performance-mode.ts`)
-- Real media support with graceful fallback (`src/components/project-media.tsx`)
-
-## Project Structure
-
-- `src/app/page.tsx` - Portal homepage (`World`, `Works`, `Experiments`, `Live`, `Contact`)
-- `src/app/work/[slug]/page.tsx` - Dynamic project detail route
-- `src/components/project-media.tsx` - Video/poster rendering with fallback gradient
-- `src/components/project-card.tsx` - Project preview card
-- `src/components/process-layer-toggle.tsx` - Behind-the-scenes reveal module
-- `src/content/site.ts` - Contact and social config
-- `src/content/identity.ts` - Palette/texture/motion rules
-- `src/content/projects.ts` - 14 curated works in 4 story categories
-
-## Media Pipeline Guidance
-
-1. Export hero loops as short WebM/MP4 clips (5-12 seconds).
-2. Keep dimensions near 1440px wide for desktop hero use.
-3. Add poster stills for each loop and lazy-load media below first viewport.
-4. Use one graded master per project and derive social cuts from that master.
-5. Keep loop length short to retain the ritual feel and reduce bandwidth.
-
-## Contact Setup
-
-1. Copy `.env.example` to `.env.local`.
-2. Set `NEXT_PUBLIC_CONTACT_EMAIL` to your booking email.
-3. If no email is set, the site automatically uses Instagram DM CTAs.
-
-## Asset Naming Convention
-
-For each project slug in `src/content/projects.ts`, add:
-
-- Loop video: `public/media/loops/<slug>.webm` (optional `.mp4` fallback)
-- Poster image: `public/media/posters/<slug>.jpg`
-
-If media is missing, the UI falls back to the project's gradient hero.
-
-## Data Safety Note
-
-- Keep raw exports, scraped data, and source archives outside `public/`.
-- Anything inside `public/` is directly web-accessible in production.
-- Store private/raw datasets in a non-public directory (for example `data/`).
-
-## Development
-
+0. Use Node `20.19.0` (repo includes `.node-version`):
 ```bash
-npm install
-npm run dev
+fnm use
 ```
 
-Then open `http://localhost:3000`.
+1. Install dependencies:
+```bash
+corepack npm install
+```
+
+2. Create `.env.local` from `.env.example` and fill required values.
+
+3. Run the app:
+```bash
+corepack npm run dev
+```
+
+4. Open `http://localhost:3000`.
+
+## Routes
+- `/` Manifesto + featured projects
+- `/work` Filterable project archive
+- `/work/[slug]` Deep case-study page
+- `/about`
+- `/contact`
+- `/api/inquiries`
+- `/api/revalidate`
+
+## Sanity Integration
+
+Schema source lives at:
+- `src/sanity/schemaTypes/project.ts`
+- `src/sanity/schemaTypes/projectCategory.ts`
+- `src/sanity/schemaTypes/siteSettings.ts`
+- `src/sanity/schemaTypes/processBlocks.ts`
+
+Studio config entrypoint:
+- `sanity.config.ts`
+
+Run Studio:
+```bash
+corepack npm run studio
+```
+
+## Revalidation Webhook
+
+Configure your Sanity webhook to `POST /api/revalidate` with:
+- JSON body containing `{ "type": "project", "slug": "your-project-slug" }` or `{ "type": "settings" }`
+- `x-revalidate-token` header set to `REVALIDATE_SECRET`
+
+## Inquiry API
+
+`POST /api/inquiries` expects JSON:
+```json
+{
+  "name": "...",
+  "email": "...",
+  "projectType": "...",
+  "budget": "...",
+  "timeline": "...",
+  "message": "...",
+  "website": ""
+}
+```
+
+`website` is a honeypot and must remain empty.
+
+## Notes
+- Existing files under `public/media` are intentionally kept but not wired into runtime.
+- All portfolio content should be published through Sanity.

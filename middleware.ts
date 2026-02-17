@@ -6,9 +6,17 @@ export function middleware(request: NextRequest) {
     return new NextResponse("Not Found", { status: 404 });
   }
 
+  const host = request.headers.get("host")?.toLowerCase();
+  if (host === "www.whoamiii.art") {
+    const canonicalUrl = request.nextUrl.clone();
+    canonicalUrl.host = "whoamiii.art";
+    canonicalUrl.protocol = "https";
+    return NextResponse.redirect(canonicalUrl, 308);
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/media/instagram-raw/:path*"]
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"]
 };

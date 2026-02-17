@@ -26,6 +26,17 @@ interface UpstashResponse<T = unknown> {
 
 const buckets = new Map<string, RateBucket>();
 let loggedUpstashFailure = false;
+let lastCleanupAt = 0;
+
+const MAX_IN_MEMORY_BUCKETS = Number.isFinite(Number(process.env.RATE_LIMIT_MAX_IN_MEMORY_BUCKETS))
+  ? Math.max(500, Math.floor(Number(process.env.RATE_LIMIT_MAX_IN_MEMORY_BUCKETS)))
+  : 10_000;
+const CLEANUP_INTERVAL_MS = Number.isFinite(Number(process.env.RATE_LIMIT_CLEANUP_INTERVAL_MS))
+  ? Math.max(500, Math.floor(Number(process.env.RATE_LIMIT_CLEANUP_INTERVAL_MS)))
+  : 5_000;
+const UPSTASH_TIMEOUT_MS = Number.isFinite(Number(process.env.UPSTASH_REDIS_TIMEOUT_MS))
+  ? Math.max(1_000, Math.floor(Number(process.env.UPSTASH_REDIS_TIMEOUT_MS)))
+  : 8_000;
 
 function getUpstashConfig() {
   const url = process.env.UPSTASH_REDIS_REST_URL?.trim();
@@ -45,14 +56,32 @@ function normalizeOptions(options: RateLimitOptions): NormalizedRateLimitOptions
 }
 
 function cleanExpiredBuckets(now: number) {
-  if (buckets.size < 5000) {
+  const shouldRunScheduledCleanup = now - lastCleanupAt >= CLEANUP_INTERVAL_MS;
+  const shouldEnforceCap = buckets.size > MAX_IN_MEMORY_BUCKETS;
+
+  if (!shouldRunScheduledCleanup && !shouldEnforceCap) {
     return;
   }
+  lastCleanupAt = now;
 
   for (const [key, bucket] of buckets.entries()) {
     if (bucket.resetAt <= now) {
       buckets.delete(key);
     }
+  }
+
+  if (buckets.size <= MAX_IN_MEMORY_BUCKETS) {
+    return;
+  }
+
+  const entriesByReset = Array.from(buckets.entries()).sort(
+    (left, right) => left[1].resetAt - right[1].resetAt
+  );
+  const overflow = buckets.size - MAX_IN_MEMORY_BUCKETS;
+  for (let index = 0; index < overflow; index += 1) {
+    const candidate = entriesByReset[index];
+    if (!candidate) break;
+    buckets.delete(candidate[0]);
   }
 }
 
@@ -94,21 +123,39 @@ async function runUpstashCommand<T>(
   config: { url: string; token: string },
   args: Array<string | number>
 ): Promise<T> {
-  const response = await fetch(config.url, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${config.token}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(args),
-    cache: "no-store"
-  });
+  const abortController = new AbortController();
+  const timeoutId = setTimeout(() => abortController.abort(), UPSTASH_TIMEOUT_MS);
+  let response: Response;
+  try {
+    response = await fetch(config.url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${config.token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(args),
+      cache: "no-store",
+      signal: abortController.signal
+    });
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      throw new Error(`Upstash request timed out after ${UPSTASH_TIMEOUT_MS}ms`);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 
   if (!response.ok) {
     throw new Error(`Upstash request failed with status ${response.status}`);
   }
 
-  const payload = (await response.json()) as UpstashResponse<T>;
+  let payload: UpstashResponse<T>;
+  try {
+    payload = (await response.json()) as UpstashResponse<T>;
+  } catch {
+    throw new Error("Upstash returned a non-JSON response");
+  }
   if (payload.error) {
     throw new Error(payload.error);
   }

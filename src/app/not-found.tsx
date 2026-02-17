@@ -1,17 +1,23 @@
 import Link from "next/link";
-import { MagneticButton } from "@/components/magnetic-button";
-import { TextReveal } from "@/components/text-reveal";
 
-export default function NotFound() {
+export default function NotFoundPage() {
   return (
-    <main id="main-content" tabIndex={-1} className="not-found top-spaced">
-      <TextReveal text="Signal Lost" as="h1" />
-      <p>The portal you tried to enter does not exist.</p>
-      <MagneticButton variant="glow">
-        <Link href="/" className="glow-button" data-cursor-hit>
-          Return To Home
-        </Link>
-      </MagneticButton>
+    <main id="main-content" className="page-shell">
+      <div className="container page-stack">
+        <section className="section-frame content-column">
+          <p className="section-kicker">404</p>
+          <h1>This page does not exist.</h1>
+          <p>The link may be outdated, unpublished, or moved to another route.</p>
+          <div className="hero-actions">
+            <Link href="/" className="button-primary">
+              Go Home
+            </Link>
+            <Link href="/work" className="button-secondary">
+              Browse Work
+            </Link>
+          </div>
+        </section>
+      </div>
     </main>
   );
 }

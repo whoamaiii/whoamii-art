@@ -3,14 +3,15 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
-  experimental: {
-    optimizePackageImports: ["framer-motion", "three"]
-  },
   images: {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "images.unsplash.com"
+        hostname: "cdn.sanity.io"
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com"
       }
     ]
   }
