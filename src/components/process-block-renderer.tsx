@@ -7,6 +7,7 @@ import type { ProcessBlock, SanityImage } from "@/types/cms";
 
 interface ProcessBlockRendererProps {
   blocks: ProcessBlock[];
+  idPrefix?: string;
 }
 
 const richTextComponents = {
@@ -38,7 +39,7 @@ function renderSanityImage(image: SanityImage | undefined, altFallback: string) 
   );
 }
 
-export function ProcessBlockRenderer({ blocks }: ProcessBlockRendererProps) {
+export function ProcessBlockRenderer({ blocks, idPrefix = "process" }: ProcessBlockRendererProps) {
   if (!blocks.length) {
     return null;
   }
@@ -51,7 +52,7 @@ export function ProcessBlockRenderer({ blocks }: ProcessBlockRendererProps) {
           switch (block._type) {
             case "richTextBlock": {
               return (
-                <article key={block._key} className="process-block">
+                <article key={block._key} id={`${idPrefix}-${block._key}`} className="process-block">
                   {block.heading ? <h3>{block.heading}</h3> : null}
                   <PortableText value={block.content} components={richTextComponents} />
                 </article>
@@ -59,7 +60,7 @@ export function ProcessBlockRenderer({ blocks }: ProcessBlockRendererProps) {
             }
             case "imageBlock": {
               return (
-                <article key={block._key} className="process-block">
+                <article key={block._key} id={`${idPrefix}-${block._key}`} className="process-block">
                   {renderSanityImage(block.image, block.alt || block.caption || "Process image")}
                   {block.beforeImage || block.afterImage ? (
                     <div className="before-after-grid">
@@ -79,7 +80,7 @@ export function ProcessBlockRenderer({ blocks }: ProcessBlockRendererProps) {
             }
             case "videoBlock": {
               return (
-                <article key={block._key} className="process-block">
+                <article key={block._key} id={`${idPrefix}-${block._key}`} className="process-block">
                   <video
                     className="process-video"
                     controls
@@ -102,7 +103,7 @@ export function ProcessBlockRenderer({ blocks }: ProcessBlockRendererProps) {
             }
             case "galleryBlock": {
               return (
-                <article key={block._key} className="process-block">
+                <article key={block._key} id={`${idPrefix}-${block._key}`} className="process-block">
                   <div className="process-gallery">
                     {block.images.map((image, index) => {
                       const imageUrl = urlForImage(image)
@@ -135,7 +136,7 @@ export function ProcessBlockRenderer({ blocks }: ProcessBlockRendererProps) {
             }
             case "milestoneBlock": {
               return (
-                <article key={block._key} className="process-block milestone-block">
+                <article key={block._key} id={`${idPrefix}-${block._key}`} className="process-block milestone-block">
                   <h3>{block.stepTitle}</h3>
                   <p>{block.description}</p>
                   <p className="mono-meta">
@@ -147,7 +148,7 @@ export function ProcessBlockRenderer({ blocks }: ProcessBlockRendererProps) {
             }
             case "quoteBlock": {
               return (
-                <article key={block._key} className="process-block quote-block">
+                <article key={block._key} id={`${idPrefix}-${block._key}`} className="process-block quote-block">
                   <blockquote>{block.quote}</blockquote>
                   {block.attribution ? <cite>{block.attribution}</cite> : null}
                 </article>

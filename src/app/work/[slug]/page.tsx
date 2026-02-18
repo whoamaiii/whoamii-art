@@ -6,6 +6,7 @@ import { ProcessBlockRenderer } from "@/components/process-block-renderer";
 import { optimizeCloudinaryVideo } from "@/lib/cloudinary";
 import { urlForImage } from "@/lib/sanity/image";
 import { getProjectBySlug, getProjectSlugs } from "@/lib/sanity/queries";
+import type { ProcessBlock } from "@/types/cms";
 
 interface WorkDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -50,6 +51,23 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
     .url();
 
   const heroVideoUrl = project.coverVideo ? optimizeCloudinaryVideo(project.coverVideo) : undefined;
+  const processSections = (project.processBlocks || []).map((block: ProcessBlock, index: number) => {
+    const fallbackLabel = `Section ${index + 1}`;
+    let label = fallbackLabel;
+    if (block._type === "richTextBlock") label = block.heading || `Text ${index + 1}`;
+    if (block._type === "imageBlock") label = block.caption || `Image ${index + 1}`;
+    if (block._type === "videoBlock") label = block.caption || `Video ${index + 1}`;
+    if (block._type === "galleryBlock") label = block.caption || `Gallery ${index + 1}`;
+    if (block._type === "milestoneBlock") label = block.stepTitle || `Milestone ${index + 1}`;
+    if (block._type === "quoteBlock") label = block.attribution || `Quote ${index + 1}`;
+    return {
+      id: `process-${block._key}`,
+      label
+    };
+  });
+  const mediaBlockCount = (project.processBlocks || []).filter((block) =>
+    block._type === "imageBlock" || block._type === "videoBlock" || block._type === "galleryBlock"
+  ).length;
 
   return (
     <main id="main-content" className="page-shell">
@@ -69,6 +87,20 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
               {project.tools.map((tool) => (
                 <li key={`${project.slug}-${tool}`}>{tool}</li>
               ))}
+            </ul>
+            <ul className="case-stats-row" aria-label="Case study stats">
+              <li>
+                <span className="mono-meta">Blocks</span>
+                <strong>{project.processBlocks.length}</strong>
+              </li>
+              <li>
+                <span className="mono-meta">Media</span>
+                <strong>{mediaBlockCount}</strong>
+              </li>
+              <li>
+                <span className="mono-meta">Status</span>
+                <strong>{project.status}</strong>
+              </li>
             </ul>
           </header>
 
@@ -107,7 +139,21 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
             </article>
           </section>
 
-          <ProcessBlockRenderer blocks={project.processBlocks || []} />
+          <section className="case-process-layout" aria-label="Process navigation and content">
+            {processSections.length ? (
+              <aside className="case-process-nav">
+                <p className="mono-meta">Process Navigator</p>
+                <ul>
+                  {processSections.map((section) => (
+                    <li key={section.id}>
+                      <a href={`#${section.id}`}>{section.label}</a>
+                    </li>
+                  ))}
+                </ul>
+              </aside>
+            ) : null}
+            <ProcessBlockRenderer blocks={project.processBlocks || []} />
+          </section>
 
           {project.credits.length ? (
             <section className="section-frame">
